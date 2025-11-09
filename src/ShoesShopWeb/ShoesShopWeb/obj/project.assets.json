@@ -2862,6 +2862,7 @@
   "projectFileDependencyGroups": {
     "net9.0": [
       "Microsoft.EntityFrameworkCore.Tools >= 9.0.10",
+      "Npgsql.EntityFrameworkCore.PostgreSQL >= 9.0.4",
       "ShoesShopWeb.BLL >= 1.0.0"
     ]
   },
@@ -2917,6 +2918,10 @@
             "suppressParent": "All",
             "target": "Package",
             "version": "[9.0.10, )"
+          },
+          "Npgsql.EntityFrameworkCore.PostgreSQL": {
+            "target": "Package",
+            "version": "[9.0.4, )"
           }
         },
         "imports": [
