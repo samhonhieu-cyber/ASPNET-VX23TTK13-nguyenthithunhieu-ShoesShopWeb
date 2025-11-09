@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShoesShopWeb", "ShoesShopWeb\ShoesShopWeb.csproj", "{D28C69FA-66AC-45A7-9F31-F7DC6CCF8121}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D28C69FA-66AC-45A7-9F31-F7DC6CCF8121}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D28C69FA-66AC-45A7-9F31-F7DC6CCF8121}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D28C69FA-66AC-45A7-9F31-F7DC6CCF8121}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D28C69FA-66AC-45A7-9F31-F7DC6CCF8121}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
