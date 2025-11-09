@@ -4,14 +4,156 @@
     "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb/ShoesShopWeb.csproj": {}
   },
   "projects": {
-    "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb/ShoesShopWeb.csproj": {
+    "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb.BLL/ShoesShopWeb.BLL.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb/ShoesShopWeb.csproj",
-        "projectName": "ShoesShopWeb",
-        "projectPath": "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb/ShoesShopWeb.csproj",
+        "projectUniqueName": "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb.BLL/ShoesShopWeb.BLL.csproj",
+        "projectName": "ShoesShopWeb.BLL",
+        "projectPath": "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb.BLL/ShoesShopWeb.BLL.csproj",
         "packagesPath": "/Users/tranduytai/.nuget/packages/",
-        "outputPath": "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb/obj/",
+        "outputPath": "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb.BLL/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/tranduytai/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb.DAL/ShoesShopWeb.DAL.csproj": {
+                "projectPath": "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb.DAL/ShoesShopWeb.DAL.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.304/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb.DAL/ShoesShopWeb.DAL.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb.DAL/ShoesShopWeb.DAL.csproj",
+        "projectName": "ShoesShopWeb.DAL",
+        "projectPath": "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb.DAL/ShoesShopWeb.DAL.csproj",
+        "packagesPath": "/Users/tranduytai/.nuget/packages/",
+        "outputPath": "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb.DAL/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/tranduytai/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb.Entity/ShoesShopWeb.Entity.csproj": {
+                "projectPath": "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb.Entity/ShoesShopWeb.Entity.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.10, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.0.10, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[9.0.4, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.304/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb.Entity/ShoesShopWeb.Entity.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb.Entity/ShoesShopWeb.Entity.csproj",
+        "projectName": "ShoesShopWeb.Entity",
+        "projectPath": "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb.Entity/ShoesShopWeb.Entity.csproj",
+        "packagesPath": "/Users/tranduytai/.nuget/packages/",
+        "outputPath": "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb.Entity/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/tranduytai/.nuget/NuGet/NuGet.Config"
@@ -43,6 +185,77 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.304/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb/ShoesShopWeb.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb/ShoesShopWeb.csproj",
+        "projectName": "ShoesShopWeb",
+        "projectPath": "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb/ShoesShopWeb.csproj",
+        "packagesPath": "/Users/tranduytai/.nuget/packages/",
+        "outputPath": "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/tranduytai/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb.BLL/ShoesShopWeb.BLL.csproj": {
+                "projectPath": "/Users/tranduytai/Documents/project_ASP.NET /ChiNhieu/src/ShoesShopWeb/ShoesShopWeb.BLL/ShoesShopWeb.BLL.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.0.10, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
