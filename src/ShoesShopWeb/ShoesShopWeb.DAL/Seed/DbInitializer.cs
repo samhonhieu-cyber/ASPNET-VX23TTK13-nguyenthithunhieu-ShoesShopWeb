@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 using ShoesShopWeb.DAL.Data;
 using ShoesShopWeb.Entity.Enums;
 using ShoesShopWeb.Entity.Models;
@@ -96,6 +97,110 @@ public static class DbInitializer
             };
             await context.Carts.AddAsync(adminCart);
             await context.SaveChangesAsync();
+        }
+
+        // Seed Products
+        if (!context.Products.Any())
+        {
+            var categories = await context.Categories.ToListAsync();
+            var colors = await context.Colors.ToListAsync();
+            var sizes = await context.Sizes.ToListAsync();
+
+            if (categories.Any() && colors.Any() && sizes.Any())
+            {
+                var products = new[]
+                {
+                    new Product
+                    {
+                        ProductName = "Nike Air Max 2024",
+                        Description = "Giày thể thao Nike Air Max với thiết kế hiện đại và công nghệ đệm khí tiên tiến",
+                        BasePrice = 2500000m,
+                        CategoryId = categories.First(c => c.CategoryName == "Giày Thể Thao").CategoryId,
+                        ImageUrl = "/images/products/nike-air-max.jpg",
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new Product
+                    {
+                        ProductName = "Adidas Ultraboost 22",
+                        Description = "Giày chạy bộ Adidas Ultraboost với công nghệ Boost độc quyền",
+                        BasePrice = 2800000m,
+                        CategoryId = categories.First(c => c.CategoryName == "Giày Thể Thao").CategoryId,
+                        ImageUrl = "/images/products/adidas-ultraboost.jpg",
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new Product
+                    {
+                        ProductName = "Converse Chuck Taylor All Star",
+                        Description = "Giày sneaker cổ điển Converse Chuck Taylor với thiết kế vượt thời gian",
+                        BasePrice = 1200000m,
+                        CategoryId = categories.First(c => c.CategoryName == "Giày Sneaker").CategoryId,
+                        ImageUrl = "/images/products/converse-chuck-taylor.jpg",
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new Product
+                    {
+                        ProductName = "Clarks Oxford Leather",
+                        Description = "Giày công sở da thật Clarks Oxford sang trọng và lịch sự",
+                        BasePrice = 3500000m,
+                        CategoryId = categories.First(c => c.CategoryName == "Giày Công Sở").CategoryId,
+                        ImageUrl = "/images/products/clarks-oxford.jpg",
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    },
+                    new Product
+                    {
+                        ProductName = "Timberland 6-Inch Boot",
+                        Description = "Giày boot Timberland chống nước cao cấp",
+                        BasePrice = 4000000m,
+                        CategoryId = categories.First(c => c.CategoryName == "Giày Boot").CategoryId,
+                        ImageUrl = "/images/products/timberland-boot.jpg",
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow
+                    }
+                };
+
+                await context.Products.AddRangeAsync(products);
+                await context.SaveChangesAsync();
+
+                // Seed Product Variants
+                var productsList = await context.Products.ToListAsync();
+                var variants = new List<ProductVariant>();
+                var random = new Random();
+
+                foreach (var product in productsList)
+                {
+                    // Tạo variants cho mỗi sản phẩm với 2-3 màu và nhiều size
+                    var productColors = colors.Take(3).ToList();
+                    var productSizes = sizes.Take(6).ToList(); // Size 36-41
+
+                    foreach (var color in productColors)
+                    {
+                        foreach (var size in productSizes)
+                        {
+                            // Tính giá variant dựa trên BasePrice với biến động nhỏ
+                            var variantPrice = product.BasePrice + (decimal)(random.Next(-100000, 200000));
+                            
+                            variants.Add(new ProductVariant
+                            {
+                                ProductId = product.ProductId,
+                                ColorId = color.ColorId,
+                                SizeId = size.SizeId,
+                                SKU = $"PRD{product.ProductId}-CLR{color.ColorId}-SZ{size.SizeId}",
+                                Price = variantPrice > 0 ? variantPrice : product.BasePrice,
+                                StockQuantity = random.Next(5, 50),
+                                IsActive = true,
+                                CreatedAt = DateTime.UtcNow
+                            });
+                        }
+                    }
+                }
+
+                await context.ProductVariants.AddRangeAsync(variants);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }
