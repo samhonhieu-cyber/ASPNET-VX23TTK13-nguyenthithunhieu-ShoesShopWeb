@@ -1,0 +1,299 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin,Staff")]
+@model ShoesShopWeb.Pages.Staff.ProductsModel
+@{
+    ViewData["Title"] = "Quản lý Sản phẩm";
+    Layout = "~/Pages/Shared/_StaffLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-box me-2"></i>Quản lý Sản phẩm</h2>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#productModal" onclick="clearProductForm()">
+        <i class="fas fa-plus me-2"></i>Thêm sản phẩm
+    </button>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <!-- Filter -->
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <select class="form-select" id="categoryFilter" onchange="filterProducts()">
+                    <option value="">Tất cả danh mục</option>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <option value="@category.CategoryId">@category.CategoryName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <input type="text" class="form-control" id="searchBox" placeholder="Tìm kiếm sản phẩm..." onkeyup="filterProducts()" />
+            </div>
+        </div>
+
+        <!-- Products Table -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Hình ảnh</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Danh mục</th>
+                        <th>Giá gốc</th>
+                        <th>Tồn kho</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="productsTableBody">
+                    @foreach (var product in Model.Products)
+                    {
+                        <tr data-category="@product.CategoryId" data-name="@product.ProductName.ToLower()">
+                            <td>
+                                @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                {
+                                    <img src="@product.ImageUrl" alt="@product.ProductName" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" />
+                                }
+                                else
+                                {
+                                    <div style="width: 60px; height: 60px; background-color: #e9ecef; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-image text-muted"></i>
+                                    </div>
+                                }
+                            </td>
+                            <td>
+                                <strong>@product.ProductName</strong>
+                                <br />
+                                @if (!string.IsNullOrEmpty(product.Description))
+                                {
+                                    var maxLength = Math.Min(50, product.Description.Length);
+                                    <small class="text-muted">@product.Description.Substring(0, maxLength)...</small>
+                                }
+                            </td>
+                            <td>@product.Category?.CategoryName</td>
+                            <td><strong>@product.BasePrice.ToString("N0") đ</strong></td>
+                            <td>
+                                @{
+                                    var totalStock = product.ProductVariants?.Sum(v => v.StockQuantity) ?? 0;
+                                }
+                                <span class="badge @(totalStock > 10 ? "bg-success" : totalStock > 0 ? "bg-warning" : "bg-danger")">
+                                    @totalStock
+                                </span>
+                            </td>
+                            <td>
+                                @if (product.IsActive)
+                                {
+                                    <span class="badge bg-success">Hoạt động</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Ngừng</span>
+                                }
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-info" onclick="editProduct(@product.ProductId)" title="Sửa">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-danger" onclick="deleteProduct(@product.ProductId, '@product.ProductName')" title="Xóa">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <a asp-page="/Staff/ProductVariants" asp-route-productId="@product.ProductId" class="btn btn-sm btn-secondary" title="Quản lý biến thể">
+                                    <i class="fas fa-cogs"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Product Modal -->
+<div class="modal fade" id="productModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" id="productForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Thêm sản phẩm mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="productId" name="productId" value="0" />
+                    
+                    <div class="mb-3">
+                        <label for="productName" class="form-label">Tên sản phẩm <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="productName" name="productName" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="categoryId" class="form-label">Danh mục <span class="text-danger">*</span></label>
+                            <select class="form-select" id="categoryId" name="categoryId" required>
+                                <option value="">Chọn danh mục</option>
+                                @foreach (var category in Model.Categories)
+                                {
+                                    <option value="@category.CategoryId">@category.CategoryName</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="basePrice" class="form-label">Giá gốc <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="basePrice" name="basePrice" min="0" step="1000" required />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="imageUrl" class="form-label">URL Hình ảnh</label>
+                        <input type="text" class="form-control" id="imageUrl" name="imageUrl" />
+                        <small class="text-muted">Để trống nếu chưa có hình ảnh</small>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="isActive" name="isActive" checked />
+                        <label class="form-check-label" for="isActive">
+                            Kích hoạt
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">
+                        <i class="fas fa-save me-2"></i>Lưu
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@Html.AntiForgeryToken()
+
+@section Scripts {
+<script>
+    function filterProducts() {
+        const categoryFilter = document.getElementById('categoryFilter').value.toLowerCase();
+        const searchText = document.getElementById('searchBox').value.toLowerCase();
+        const rows = document.querySelectorAll('#productsTableBody tr');
+
+        rows.forEach(row => {
+            const category = row.getAttribute('data-category').toLowerCase();
+            const name = row.getAttribute('data-name');
+            
+            const matchCategory = !categoryFilter || category === categoryFilter;
+            const matchSearch = !searchText || name.includes(searchText);
+
+            if (matchCategory && matchSearch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    function clearProductForm() {
+        document.getElementById('productForm').reset();
+        document.getElementById('productId').value = '0';
+        document.getElementById('modalTitle').textContent = 'Thêm sản phẩm mới';
+        document.getElementById('saveBtn').innerHTML = '<i class="fas fa-save me-2"></i>Lưu';
+    }
+
+    async function editProduct(productId) {
+        try {
+            const response = await fetch(`/Staff/Products?handler=GetProduct&id=${productId}`);
+            const product = await response.json();
+
+            document.getElementById('productId').value = product.productId;
+            document.getElementById('productName').value = product.productName;
+            document.getElementById('description').value = product.description || '';
+            document.getElementById('categoryId').value = product.categoryId;
+            document.getElementById('basePrice').value = product.basePrice;
+            document.getElementById('imageUrl').value = product.imageUrl || '';
+            document.getElementById('isActive').checked = product.isActive;
+
+            document.getElementById('modalTitle').textContent = 'Sửa sản phẩm';
+            document.getElementById('saveBtn').innerHTML = '<i class="fas fa-save me-2"></i>Cập nhật';
+
+            new bootstrap.Modal(document.getElementById('productModal')).show();
+        } catch (error) {
+            alert('Lỗi khi tải thông tin sản phẩm');
+        }
+    }
+
+    async function deleteProduct(productId, productName) {
+        if (!confirm(`Bạn có chắc muốn xóa sản phẩm "${productName}"?`)) {
+            return;
+        }
+
+        try {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            const response = await fetch(`/Staff/Products?handler=Delete&id=${productId}`, {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': token
+                }
+            });
+
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Lỗi khi xóa sản phẩm');
+            }
+        } catch (error) {
+            alert('Lỗi khi xóa sản phẩm');
+        }
+    }
+
+    // Submit form with AJAX
+    document.getElementById('productForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const productId = document.getElementById('productId').value;
+        const handler = productId === '0' ? 'Create' : 'Update';
+        
+        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+        try {
+            const response = await fetch(`/Staff/Products?handler=${handler}`, {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': token
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Lỗi khi lưu sản phẩm');
+            }
+        } catch (error) {
+            alert('Lỗi khi lưu sản phẩm');
+        }
+    });
+</script>
+}
