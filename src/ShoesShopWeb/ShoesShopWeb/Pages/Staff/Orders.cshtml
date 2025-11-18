@@ -1,0 +1,285 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@using ShoesShopWeb.Entity.Enums
+@attribute [Authorize(Roles = "Admin,Staff")]
+@model ShoesShopWeb.Pages.Staff.OrdersModel
+@{
+    ViewData["Title"] = "Quản lý Đơn hàng";
+    Layout = "~/Pages/Shared/_StaffLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-shopping-cart me-2"></i>Quản lý Đơn hàng</h2>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <!-- Filters -->
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <select class="form-select" id="statusFilter" onchange="filterOrders()">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="@((int)OrderStatus.Pending)">Chờ thanh toán</option>
+                    <option value="@((int)OrderStatus.Processing)">Đã xác nhận</option>
+                    <option value="@((int)OrderStatus.Shipping)">Đang giao hàng</option>
+                    <option value="@((int)OrderStatus.Delivered)">Đã giao hàng</option>
+                    <option value="@((int)OrderStatus.Cancelled)">Đã hủy</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <input type="text" class="form-control" id="searchBox" placeholder="Tìm theo mã đơn, tên khách hàng..." onkeyup="filterOrders()" />
+            </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Mã đơn hàng</th>
+                        <th>Khách hàng</th>
+                        <th>Ngày đặt</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                    @foreach (var order in Model.Orders)
+                    {
+                        <tr data-status="@((int)order.Status)" 
+                            data-order="@order.OrderNumber.ToLower()" 
+                            data-customer="@order.User?.FullName.ToLower()">
+                            <td>
+                                <strong>@order.OrderNumber</strong>
+                            </td>
+                            <td>
+                                <div>@order.User?.FullName</div>
+                                <small class="text-muted">@order.PhoneNumber</small>
+                            </td>
+                            <td>@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td><strong>@order.TotalAmount.ToString("N0") đ</strong></td>
+                            <td>
+                                @switch (order.Status)
+                                {
+                                    case OrderStatus.Pending:
+                                        <span class="badge bg-warning text-dark">Chờ thanh toán</span>
+                                        break;
+                                    case OrderStatus.Processing:
+                                        <span class="badge bg-info">Đã xác nhận</span>
+                                        break;
+                                    case OrderStatus.Shipping:
+                                        <span class="badge bg-primary">Đang giao hàng</span>
+                                        break;
+                                    case OrderStatus.Delivered:
+                                        <span class="badge bg-success">Đã giao hàng</span>
+                                        break;
+                                    case OrderStatus.Cancelled:
+                                        <span class="badge bg-danger">Đã hủy</span>
+                                        break;
+                                }
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-info" onclick="viewOrder(@order.OrderId)" title="Chi tiết">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                @if (order.Status != OrderStatus.Delivered && order.Status != OrderStatus.Cancelled)
+                                {
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            @if (order.Status == OrderStatus.Pending)
+                                            {
+                                                <li><a class="dropdown-item" href="#" onclick="updateOrderStatus(@order.OrderId, @((int)OrderStatus.Processing))">Xác nhận</a></li>
+                                            }
+                                            @if (order.Status == OrderStatus.Processing)
+                                            {
+                                                <li><a class="dropdown-item" href="#" onclick="updateOrderStatus(@order.OrderId, @((int)OrderStatus.Shipping))">Giao hàng</a></li>
+                                            }
+                                            @if (order.Status == OrderStatus.Shipping)
+                                            {
+                                                <li><a class="dropdown-item" href="#" onclick="updateOrderStatus(@order.OrderId, @((int)OrderStatus.Delivered))">Đã giao</a></li>
+                                            }
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item text-danger" href="#" onclick="updateOrderStatus(@order.OrderId, @((int)OrderStatus.Cancelled))">Hủy đơn</a></li>
+                                        </ul>
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Order Detail Modal -->
+<div class="modal fade" id="orderModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chi tiết đơn hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="orderDetails">
+                <!-- Loaded via AJAX -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.AntiForgeryToken()
+
+@section Scripts {
+<script>
+    function filterOrders() {
+        const statusFilter = document.getElementById('statusFilter').value;
+        const searchText = document.getElementById('searchBox').value.toLowerCase();
+        const rows = document.querySelectorAll('#ordersTableBody tr');
+
+        rows.forEach(row => {
+            const status = row.getAttribute('data-status');
+            const orderNumber = row.getAttribute('data-order');
+            const customer = row.getAttribute('data-customer');
+            
+            const matchStatus = !statusFilter || status === statusFilter;
+            const matchSearch = !searchText || orderNumber.includes(searchText) || customer.includes(searchText);
+
+            if (matchStatus && matchSearch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    async function viewOrder(orderId) {
+        try {
+            const response = await fetch(`/Staff/Orders?handler=GetOrder&id=${orderId}`);
+            const data = await response.json();
+
+            const statusBadge = getStatusBadge(data.status);
+            
+            let itemsHtml = '';
+            data.items.forEach(item => {
+                itemsHtml += `
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                ${item.imageUrl ? `<img src="${item.imageUrl}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; margin-right: 10px;" />` : ''}
+                                <div>
+                                    <strong>${item.productName}</strong><br />
+                                    <small class="text-muted">Kích cỡ: ${item.size} | Màu: ${item.color}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">${item.quantity}</td>
+                        <td class="text-end">${item.unitPrice.toLocaleString('vi-VN')} đ</td>
+                        <td class="text-end"><strong>${item.subtotal.toLocaleString('vi-VN')} đ</strong></td>
+                    </tr>
+                `;
+            });
+
+            const html = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Thông tin đơn hàng</h6>
+                        <p><strong>Mã đơn hàng:</strong> ${data.orderNumber}</p>
+                        <p><strong>Ngày đặt:</strong> ${new Date(data.orderDate).toLocaleString('vi-VN')}</p>
+                        <p><strong>Trạng thái:</strong> ${statusBadge}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Thông tin khách hàng</h6>
+                        <p><strong>Họ tên:</strong> ${data.customerName}</p>
+                        <p><strong>Số điện thoại:</strong> ${data.phoneNumber}</p>
+                        <p><strong>Địa chỉ:</strong> ${data.shippingAddress}</p>
+                        ${data.note ? `<p><strong>Ghi chú:</strong> ${data.note}</p>` : ''}
+                    </div>
+                </div>
+                <hr />
+                <h6>Chi tiết sản phẩm</h6>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th class="text-center">Số lượng</th>
+                            <th class="text-end">Đơn giá</th>
+                            <th class="text-end">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHtml}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>Tổng cộng:</strong></td>
+                            <td class="text-end"><h5 class="mb-0">${data.totalAmount.toLocaleString('vi-VN')} đ</h5></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+
+            document.getElementById('orderDetails').innerHTML = html;
+            new bootstrap.Modal(document.getElementById('orderModal')).show();
+        } catch (error) {
+            alert('Lỗi khi tải thông tin đơn hàng');
+        }
+    }
+
+    function getStatusBadge(status) {
+        const badges = {
+            0: '<span class="badge bg-warning text-dark">Chờ thanh toán</span>',
+            1: '<span class="badge bg-info">Đã xác nhận</span>',
+            2: '<span class="badge bg-primary">Đang giao hàng</span>',
+            3: '<span class="badge bg-success">Đã giao hàng</span>',
+            4: '<span class="badge bg-danger">Đã hủy</span>'
+        };
+        return badges[status] || '';
+    }
+
+    async function updateOrderStatus(orderId, newStatus) {
+        const statusNames = {
+            1: 'xác nhận',
+            2: 'chuyển sang giao hàng',
+            3: 'đánh dấu đã giao',
+            4: 'hủy'
+        };
+
+        if (!confirm(`Bạn có chắc muốn ${statusNames[newStatus]} đơn hàng này?`)) {
+            return;
+        }
+
+        try {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            const response = await fetch(`/Staff/Orders?handler=UpdateStatus&id=${orderId}&status=${newStatus}`, {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': token
+                }
+            });
+
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Lỗi khi cập nhật trạng thái đơn hàng');
+            }
+        } catch (error) {
+            alert('Lỗi khi cập nhật trạng thái đơn hàng');
+        }
+    }
+</script>
+}
