@@ -1,0 +1,224 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin,Staff")]
+@model ShoesShopWeb.Pages.Staff.CustomersModel
+@{
+    ViewData["Title"] = "Quản lý Khách hàng";
+    Layout = "~/Pages/Shared/_StaffLayout.cshtml";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-users me-2"></i>Quản lý Khách hàng</h2>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <!-- Search -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <input type="text" class="form-control" id="searchBox" placeholder="Tìm kiếm khách hàng..." onkeyup="filterCustomers()" />
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" id="statusFilter" onchange="filterCustomers()">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="true">Hoạt động</option>
+                    <option value="false">Ngừng hoạt động</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Customers Table -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Mã KH</th>
+                        <th>Họ tên</th>
+                        <th>Email</th>
+                        <th>Số điện thoại</th>
+                        <th>Địa chỉ</th>
+                        <th>Đơn hàng</th>
+                        <th>Trạng thái</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="customersTableBody">
+                    @foreach (var customer in Model.Customers)
+                    {
+                        <tr data-name="@customer.FullName.ToLower()" data-email="@customer.Email.ToLower()" data-status="@customer.IsActive.ToString().ToLower()">
+                            <td><strong>#@customer.UserId</strong></td>
+                            <td>@customer.FullName</td>
+                            <td>@customer.Email</td>
+                            <td>@customer.PhoneNumber</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(customer.Address))
+                                {
+                                    <small>@customer.Address.Substring(0, Math.Min(30, customer.Address.Length))...</small>
+                                }
+                                else
+                                {
+                                    <small class="text-muted">Chưa cập nhật</small>
+                                }
+                            </td>
+                            <td>
+                                @{
+                                    var orderCount = customer.Orders?.Count() ?? 0;
+                                }
+                                <span class="badge bg-info">@orderCount đơn</span>
+                            </td>
+                            <td>
+                                @if (customer.IsActive)
+                                {
+                                    <span class="badge bg-success">Hoạt động</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Ngừng</span>
+                                }
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-info" onclick="viewCustomer(@customer.UserId)" title="Chi tiết">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                @if (customer.IsActive)
+                                {
+                                    <button type="button" class="btn btn-sm btn-warning" onclick="toggleCustomerStatus(@customer.UserId, false)" title="Vô hiệu hóa">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-sm btn-success" onclick="toggleCustomerStatus(@customer.UserId, true)" title="Kích hoạt">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Customer Detail Modal -->
+<div class="modal fade" id="customerModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thông tin khách hàng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="customerDetails">
+                <!-- Loaded via AJAX -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.AntiForgeryToken()
+
+@section Scripts {
+<script>
+    function filterCustomers() {
+        const searchText = document.getElementById('searchBox').value.toLowerCase();
+        const statusFilter = document.getElementById('statusFilter').value.toLowerCase();
+        const rows = document.querySelectorAll('#customersTableBody tr');
+
+        rows.forEach(row => {
+            const name = row.getAttribute('data-name');
+            const email = row.getAttribute('data-email');
+            const status = row.getAttribute('data-status');
+            
+            const matchSearch = !searchText || name.includes(searchText) || email.includes(searchText);
+            const matchStatus = !statusFilter || status === statusFilter;
+
+            if (matchSearch && matchStatus) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    async function viewCustomer(customerId) {
+        try {
+            const response = await fetch(`/Staff/Customers?handler=GetCustomer&id=${customerId}`);
+            const data = await response.json();
+
+            const html = `
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong>Mã khách hàng:</strong> #${data.userId}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Họ tên:</strong> ${data.fullName}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Email:</strong> ${data.email}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Số điện thoại:</strong> ${data.phoneNumber}
+                    </div>
+                    <div class="col-12 mb-3">
+                        <strong>Địa chỉ:</strong> ${data.address || 'Chưa cập nhật'}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Ngày đăng ký:</strong> ${new Date(data.createdAt).toLocaleDateString('vi-VN')}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Trạng thái:</strong> 
+                        ${data.isActive ? '<span class="badge bg-success">Hoạt động</span>' : '<span class="badge bg-secondary">Ngừng</span>'}
+                    </div>
+                    <div class="col-12">
+                        <h6 class="mt-3">Lịch sử đơn hàng</h6>
+                        <p>Tổng số đơn hàng: <strong>${data.orderCount}</strong></p>
+                        <p>Tổng giá trị: <strong>${data.totalSpent.toLocaleString('vi-VN')} đ</strong></p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('customerDetails').innerHTML = html;
+            new bootstrap.Modal(document.getElementById('customerModal')).show();
+        } catch (error) {
+            alert('Lỗi khi tải thông tin khách hàng');
+        }
+    }
+
+    async function toggleCustomerStatus(customerId, newStatus) {
+        const action = newStatus ? 'kích hoạt' : 'vô hiệu hóa';
+        if (!confirm(`Bạn có chắc muốn ${action} khách hàng này?`)) {
+            return;
+        }
+
+        try {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            const response = await fetch(`/Staff/Customers?handler=ToggleStatus&id=${customerId}&status=${newStatus}`, {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': token
+                }
+            });
+
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Lỗi khi cập nhật trạng thái');
+            }
+        } catch (error) {
+            alert('Lỗi khi cập nhật trạng thái');
+        }
+    }
+</script>
+}
