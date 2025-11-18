@@ -177,6 +177,64 @@ public class UserService : IUserService
         return await _unitOfWork.Users.EmailExistsAsync(email);
     }
 
+    public async Task<User?> GetUserEntityByEmailAsync(string email)
+    {
+        return await _unitOfWork.Users.GetByEmailAsync(email);
+    }
+
+    public async Task CreateUserAsync(User user)
+    {
+        await _unitOfWork.Users.AddAsync(user);
+        await _unitOfWork.SaveChangesAsync(); // Save user first to get UserId
+        
+        // Create cart for new user
+        var cart = new Cart
+        {
+            UserId = user.UserId,
+            CreatedAt = DateTime.UtcNow
+        };
+        await _unitOfWork.Carts.AddAsync(cart);
+        
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    public string HashPassword(string password)
+    {
+        return PasswordHasher.HashPassword(password);
+    }
+
+    public bool VerifyPassword(string password, string passwordHash)
+    {
+        return PasswordHasher.VerifyPassword(password, passwordHash);
+    }
+
+    public async Task<List<User>> GetAllCustomersAsync()
+    {
+        var allUsers = await _unitOfWork.Users.GetAllAsync();
+        return allUsers.Where(u => u.Role == UserRole.Customer).ToList();
+    }
+
+    public async Task<bool> UpdateUserStatusAsync(int userId, bool isActive)
+    {
+        try
+        {
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            if (user == null) return false;
+
+            user.IsActive = isActive;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            _unitOfWork.Users.Update(user);
+            await _unitOfWork.SaveChangesAsync();
+
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     private static UserDto MapToUserDto(User user)
     {
         return new UserDto

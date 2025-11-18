@@ -1,4 +1,5 @@
 using ShoesShopWeb.Entity.DTOs;
+using ShoesShopWeb.Entity.Models;
 
 namespace ShoesShopWeb.BLL.Interfaces;
 
@@ -11,4 +12,5 @@ public interface ICategoryService
     Task<(bool Success, string Message)> UpdateCategoryAsync(int categoryId, CategoryUpdateDto updateDto);
     Task<(bool Success, string Message)> DeleteCategoryAsync(int categoryId);
     Task<bool> CategoryExistsAsync(int categoryId);
+    Task<List<Category>> GetAllActiveCategoriesAsync();
 }

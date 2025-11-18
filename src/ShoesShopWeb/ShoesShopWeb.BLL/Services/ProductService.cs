@@ -141,6 +141,75 @@ public class ProductService : IProductService
         return await _unitOfWork.Products.AnyAsync(p => p.ProductId == productId);
     }
 
+    public async Task<List<Product>> GetFeaturedProductsAsync(int count)
+    {
+        var products = await _unitOfWork.Products.GetActiveProductsAsync();
+        return products.Take(count).ToList();
+    }
+
+    public async Task<(List<Product> Products, int TotalCount)> GetProductsWithFiltersAsync(
+        string? keyword,
+        int? categoryId,
+        List<int>? sizeIds,
+        List<int>? colorIds,
+        decimal? minPrice,
+        decimal? maxPrice,
+        string? sortBy,
+        int pageNumber,
+        int pageSize)
+    {
+        var products = (await _unitOfWork.Products.GetActiveProductsAsync()).AsQueryable();
+        
+        // Apply filters
+        if (!string.IsNullOrEmpty(keyword))
+        {
+            products = products.Where(p => 
+                p.ProductName.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
+                (p.Description != null && p.Description.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+            );
+        }
+
+        if (categoryId.HasValue)
+        {
+            products = products.Where(p => p.CategoryId == categoryId.Value);
+        }
+
+        if (minPrice.HasValue)
+        {
+            products = products.Where(p => p.BasePrice >= minPrice.Value);
+        }
+
+        if (maxPrice.HasValue)
+        {
+            products = products.Where(p => p.BasePrice <= maxPrice.Value);
+        }
+
+        // Sort
+        products = sortBy switch
+        {
+            "name" => products.OrderBy(p => p.ProductName),
+            "price-asc" => products.OrderBy(p => p.BasePrice),
+            "price-desc" => products.OrderByDescending(p => p.BasePrice),
+            "newest" => products.OrderByDescending(p => p.CreatedAt),
+            _ => products.OrderBy(p => p.ProductId)
+        };
+
+        var totalCount = products.Count();
+
+        // Pagination
+        var result = products
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        return (result, totalCount);
+    }
+
+    public async Task<Product?> GetProductWithDetailsAsync(int productId)
+    {
+        return await _unitOfWork.Products.GetProductWithVariantsAsync(productId);
+    }
+
     private static ProductDto MapToProductDto(Product product)
     {
         return new ProductDto

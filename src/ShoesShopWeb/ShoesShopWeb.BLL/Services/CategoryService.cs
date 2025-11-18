@@ -117,6 +117,12 @@ public class CategoryService : ICategoryService
         return await _unitOfWork.Categories.AnyAsync(c => c.CategoryId == categoryId);
     }
 
+    public async Task<List<Category>> GetAllActiveCategoriesAsync()
+    {
+        var categories = await _unitOfWork.Categories.GetActiveCategoriesAsync();
+        return categories.ToList();
+    }
+
     private static CategoryDto MapToCategoryDto(Category category)
     {
         return new CategoryDto
