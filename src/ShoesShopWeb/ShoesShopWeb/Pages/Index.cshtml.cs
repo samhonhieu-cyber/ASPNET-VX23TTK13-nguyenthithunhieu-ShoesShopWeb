@@ -12,7 +12,9 @@ public class IndexModel : PageModel
         _logger = logger;
     }
 
-    public void OnGet()
+    public IActionResult OnGet()
     {
+        // Redirect to Product listing page instead of showing home page
+        return RedirectToPage("/Products/Index");
     }
 }
