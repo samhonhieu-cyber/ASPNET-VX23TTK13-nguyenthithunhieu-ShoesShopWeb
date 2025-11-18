@@ -1,0 +1,215 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@using ShoesShopWeb.Entity.Enums
+@attribute [Authorize]
+@model ShoesShopWeb.Pages.Orders.OrderConfirmationModel
+@{
+    ViewData["Title"] = "Xác nhận đơn hàng";
+    Layout = "~/Pages/Shared/_CustomerLayout.cshtml";
+}
+
+<div class="container py-5">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model.Order == null)
+    {
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>Không tìm thấy đơn hàng
+        </div>
+        <a asp-page="/Orders/MyOrders" class="btn btn-primary">
+            <i class="fas fa-list me-2"></i>Xem đơn hàng của tôi
+        </a>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <!-- Order Status Card -->
+                <div class="card shadow mb-4">
+                    <div class="card-body text-center py-5">
+                        <div class="mb-4">
+                            @if (Model.Order.Status == OrderStatus.Pending)
+                            {
+                                <i class="fas fa-clock text-warning" style="font-size: 5rem;"></i>
+                            }
+                            else if (Model.Order.Status == OrderStatus.Processing)
+                            {
+                                <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
+                            }
+                        </div>
+                        
+                        <h2 class="mb-3">
+                            @if (Model.Order.Status == OrderStatus.Pending)
+                            {
+                                <text>Đơn hàng đã được tạo!</text>
+                            }
+                            else if (Model.Order.Status == OrderStatus.Processing)
+                            {
+                                <text>Đơn hàng đã được xác nhận!</text>
+                            }
+                        </h2>
+
+                        <p class="lead mb-4">
+                            Mã đơn hàng: <strong class="text-primary">@Model.Order.OrderNumber</strong>
+                        </p>
+
+                        @if (Model.Order.Status == OrderStatus.Pending)
+                        {
+                            <div class="alert alert-warning">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Đơn hàng của bạn đang ở trạng thái <strong>Chờ thanh toán</strong>.
+                                <br />Vui lòng xác nhận thanh toán để chúng tôi xử lý đơn hàng.
+                            </div>
+
+                            <form method="post" asp-page-handler="ConfirmPayment">
+                                <input type="hidden" name="orderId" value="@Model.Order.OrderId" />
+                                <button type="submit" class="btn btn-success btn-lg px-5">
+                                    <i class="fas fa-credit-card me-2"></i>Xác nhận thanh toán
+                                </button>
+                            </form>
+                        }
+                        else if (Model.Order.Status == OrderStatus.Processing)
+                        {
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Đơn hàng đã được xác nhận và đang được xử lý.
+                                <br />Chúng tôi sẽ liên hệ với bạn sớm nhất!
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Order Details Card -->
+                <div class="card shadow mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Thông tin đơn hàng</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-sm-4 text-muted">Ngày đặt:</div>
+                            <div class="col-sm-8">@Model.Order.OrderDate.ToString("dd/MM/yyyy HH:mm")</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4 text-muted">Trạng thái:</div>
+                            <div class="col-sm-8">
+                                @switch (Model.Order.Status)
+                                {
+                                    case OrderStatus.Pending:
+                                        <span class="badge bg-warning">Chờ thanh toán</span>
+                                        break;
+                                    case OrderStatus.Processing:
+                                        <span class="badge bg-info">Đã xác nhận</span>
+                                        break;
+                                    case OrderStatus.Shipping:
+                                        <span class="badge bg-primary">Đang giao hàng</span>
+                                        break;
+                                    case OrderStatus.Delivered:
+                                        <span class="badge bg-success">Đã giao hàng</span>
+                                        break;
+                                    case OrderStatus.Cancelled:
+                                        <span class="badge bg-danger">Đã hủy</span>
+                                        break;
+                                }
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4 text-muted">Người nhận:</div>
+                            <div class="col-sm-8"><strong>@Model.Order.User?.FullName</strong></div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4 text-muted">Số điện thoại:</div>
+                            <div class="col-sm-8">@Model.Order.PhoneNumber</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4 text-muted">Địa chỉ giao hàng:</div>
+                            <div class="col-sm-8">@Model.Order.ShippingAddress</div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(Model.Order.Note))
+                        {
+                            <div class="row">
+                                <div class="col-sm-4 text-muted">Ghi chú:</div>
+                                <div class="col-sm-8">@Model.Order.Note</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Order Items Card -->
+                <div class="card shadow mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-box me-2"></i>Sản phẩm đã đặt</h5>
+                    </div>
+                    <div class="card-body">
+                        @if (Model.Order.OrderItems != null && Model.Order.OrderItems.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Sản phẩm</th>
+                                            <th>Đơn giá</th>
+                                            <th class="text-center">Số lượng</th>
+                                            <th class="text-end">Thành tiền</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.Order.OrderItems)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        @if (!string.IsNullOrEmpty(item.ProductVariant?.Product?.ImageUrl))
+                                                        {
+                                                            <img src="@item.ProductVariant.Product.ImageUrl" 
+                                                                 alt="@item.ProductVariant.Product.ProductName" 
+                                                                 class="me-3" 
+                                                                 style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" />
+                                                        }
+                                                        <div>
+                                                            <div class="fw-bold">@item.ProductVariant?.Product?.ProductName</div>
+                                                            <small class="text-muted">
+                                                                Kích cỡ: @item.ProductVariant?.Size?.SizeValue | 
+                                                                Màu: @item.ProductVariant?.Color?.ColorName
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>@item.UnitPrice.ToString("N0") đ</td>
+                                                <td class="text-center">@item.Quantity</td>
+                                                <td class="text-end fw-bold">@item.Subtotal.ToString("N0") đ</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="3" class="text-end"><strong>Tổng cộng:</strong></td>
+                                            <td class="text-end">
+                                                <h5 class="text-primary mb-0">@Model.Order.TotalAmount.ToString("N0") đ</h5>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="text-center">
+                    <a asp-page="/Orders/MyOrders" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-list me-2"></i>Xem đơn hàng của tôi
+                    </a>
+                    <a asp-page="/Products/Index" class="btn btn-outline-secondary">
+                        <i class="fas fa-shopping-bag me-2"></i>Tiếp tục mua sắm
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

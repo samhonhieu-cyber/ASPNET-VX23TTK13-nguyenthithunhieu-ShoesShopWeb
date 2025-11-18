@@ -1,0 +1,136 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@model ShoesShopWeb.Pages.Orders.CheckoutModel
+@{
+    ViewData["Title"] = "Đặt hàng";
+    Layout = "~/Pages/Shared/_CustomerLayout.cshtml";
+}
+
+<div class="container py-5">
+    <h2 class="mb-4"><i class="fas fa-clipboard-list me-2"></i>Xác nhận đơn hàng</h2>
+
+    @if (Model.Cart == null || !Model.Cart.Items.Any())
+    {
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Giỏ hàng trống. Vui lòng thêm sản phẩm trước khi đặt hàng.
+        </div>
+        <a asp-page="/Products/Index" class="btn btn-primary">
+            <i class="fas fa-shopping-bag me-2"></i>Tiếp tục mua sắm
+        </a>
+    }
+    else
+    {
+        <form method="post">
+            <div class="row">
+                <!-- Thông tin giao hàng -->
+                <div class="col-lg-8 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-truck me-2"></i>Thông tin giao hàng</h5>
+                        </div>
+                        <div class="card-body">
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                            <div class="mb-3">
+                                <label asp-for="Input.FullName" class="form-label"></label>
+                                <input asp-for="Input.FullName" class="form-control" />
+                                <span asp-validation-for="Input.FullName" class="text-danger"></span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Input.PhoneNumber" class="form-label"></label>
+                                    <input asp-for="Input.PhoneNumber" class="form-control" placeholder="0123456789" />
+                                    <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Input.Email" class="form-label"></label>
+                                    <input asp-for="Input.Email" class="form-control" readonly />
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Input.ShippingAddress" class="form-label"></label>
+                                <textarea asp-for="Input.ShippingAddress" class="form-control" rows="3" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố"></textarea>
+                                <span asp-validation-for="Input.ShippingAddress" class="text-danger"></span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label asp-for="Input.Note" class="form-label"></label>
+                                <textarea asp-for="Input.Note" class="form-control" rows="2" placeholder="Ghi chú cho người giao hàng (không bắt buộc)"></textarea>
+                                <span asp-validation-for="Input.Note" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thông tin đơn hàng -->
+                <div class="col-lg-4">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>Đơn hàng của bạn</h5>
+                        </div>
+                        <div class="card-body">
+                            @foreach (var item in Model.Cart.Items)
+                            {
+                                <div class="d-flex justify-content-between mb-2">
+                                    <div class="flex-grow-1">
+                                        <p class="mb-0 fw-bold">@item.ProductName</p>
+                                        <small class="text-muted">
+                                            @item.SizeValue | @item.ColorName × @item.Quantity
+                                        </small>
+                                    </div>
+                                    <div class="text-end">
+                                        <p class="mb-0">@item.TotalPrice.ToString("N0") đ</p>
+                                    </div>
+                                </div>
+                                @if (item != Model.Cart.Items.Last())
+                                {
+                                    <hr class="my-2" />
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tạm tính:</span>
+                                <strong>@Model.Cart.TotalAmount.ToString("N0") đ</strong>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Phí vận chuyển:</span>
+                                <strong class="text-success">Miễn phí</strong>
+                            </div>
+                            <hr />
+                            <div class="d-flex justify-content-between mb-3">
+                                <h5>Tổng cộng:</h5>
+                                <h5 class="text-primary">@Model.Cart.TotalAmount.ToString("N0") đ</h5>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 btn-lg">
+                                <i class="fas fa-check-circle me-2"></i>Xác nhận đặt hàng
+                            </button>
+
+                            <a asp-page="/Cart/Index" class="btn btn-outline-secondary w-100 mt-2">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại giỏ hàng
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mt-3 small">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Đơn hàng sẽ được tạo với trạng thái <strong>Chờ xác nhận</strong>. 
+                        Bạn cần thanh toán để xác nhận đơn hàng.
+                    </div>
+                </div>
+            </div>
+        </form>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
