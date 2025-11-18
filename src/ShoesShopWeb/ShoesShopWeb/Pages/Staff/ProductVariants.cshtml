@@ -1,0 +1,333 @@
+@page
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin,Staff")]
+@model ShoesShopWeb.Pages.Staff.ProductVariantsModel
+@{
+    ViewData["Title"] = "Quản lý Biến thể - " + Model.Product?.ProductName;
+    Layout = "~/Pages/Shared/_StaffLayout.cshtml";
+}
+
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-page="/Staff/Products">Sản phẩm</a></li>
+        <li class="breadcrumb-item active">Biến thể - @Model.Product?.ProductName</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2><i class="fas fa-cogs me-2"></i>Quản lý Biến thể</h2>
+        <p class="text-muted mb-0">Sản phẩm: <strong>@Model.Product?.ProductName</strong></p>
+    </div>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#variantModal" onclick="clearVariantForm()">
+        <i class="fas fa-plus me-2"></i>Thêm biến thể
+    </button>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>@TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        @if (Model.Variants.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>SKU</th>
+                            <th>Màu sắc</th>
+                            <th>Kích cỡ</th>
+                            <th>Giá</th>
+                            <th>Tồn kho</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var variant in Model.Variants)
+                        {
+                            <tr>
+                                <td>
+                                    <code>@variant.SKU</code>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        @if (!string.IsNullOrEmpty(variant.Color?.ColorCode))
+                                        {
+                                            <span class="color-box me-2" style="background-color: @variant.Color.ColorCode; width: 24px; height: 24px; border-radius: 4px; border: 1px solid #ddd; display: inline-block;"></span>
+                                        }
+                                        <span>@variant.Color?.ColorName</span>
+                                    </div>
+                                </td>
+                                <td><strong>@variant.Size?.SizeValue</strong></td>
+                                <td>
+                                    <strong>@variant.Price.ToString("N0") đ</strong>
+                                    @if (variant.Price != Model.Product?.BasePrice)
+                                    {
+                                        <br />
+                                        <small class="text-muted">(Giá gốc: @Model.Product?.BasePrice.ToString("N0") đ)</small>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="badge @(variant.StockQuantity > 10 ? "bg-success" : variant.StockQuantity > 0 ? "bg-warning" : "bg-danger")">
+                                        @variant.StockQuantity
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (variant.IsActive)
+                                    {
+                                        <span class="badge bg-success">Hoạt động</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Ngừng</span>
+                                    }
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-info" onclick="editVariant(@variant.VariantId)" title="Sửa">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger" onclick="deleteVariant(@variant.VariantId, '@variant.SKU')" title="Xóa">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" class="text-end"><strong>Tổng tồn kho:</strong></td>
+                            <td>
+                                <span class="badge bg-primary">@Model.Variants.Sum(v => v.StockQuantity)</span>
+                            </td>
+                            <td colspan="2"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle fa-2x mb-3"></i>
+                <p class="mb-0">Chưa có biến thể nào. Hãy thêm biến thể cho sản phẩm này.</p>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Variant Modal -->
+<div class="modal fade" id="variantModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" id="variantForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Thêm biến thể mới</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="variantId" name="variantId" value="0" />
+                    <input type="hidden" name="productId" value="@Model.ProductId" />
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="colorId" class="form-label">Màu sắc <span class="text-danger">*</span></label>
+                            <select class="form-select" id="colorId" name="colorId" required>
+                                <option value="">Chọn màu sắc</option>
+                                @foreach (var color in Model.Colors)
+                                {
+                                    <option value="@color.ColorId" data-color="@color.ColorCode">
+                                        @color.ColorName
+                                    </option>
+                                }
+                            </select>
+                            <div id="colorPreview" class="mt-2"></div>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="sizeId" class="form-label">Kích cỡ <span class="text-danger">*</span></label>
+                            <select class="form-select" id="sizeId" name="sizeId" required>
+                                <option value="">Chọn kích cỡ</option>
+                                @foreach (var size in Model.Sizes)
+                                {
+                                    <option value="@size.SizeId">@size.SizeValue</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="price" class="form-label">Giá <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="price" name="price" min="0" step="1000" value="@Model.Product?.BasePrice" required />
+                            <small class="text-muted">Giá gốc sản phẩm: @Model.Product?.BasePrice.ToString("N0") đ</small>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="stockQuantity" class="form-label">Số lượng tồn kho <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="stockQuantity" name="stockQuantity" min="0" value="0" required />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="sku" class="form-label">SKU</label>
+                        <input type="text" class="form-control" id="sku" name="sku" readonly />
+                        <small class="text-muted">SKU sẽ được tự động tạo dựa trên sản phẩm, màu và size</small>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="isActive" name="isActive" checked />
+                        <label class="form-check-label" for="isActive">
+                            Kích hoạt
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">
+                        <i class="fas fa-save me-2"></i>Lưu
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@Html.AntiForgeryToken()
+
+@section Scripts {
+<script>
+    // Auto-generate SKU when color or size changes
+    function updateSKU() {
+        const productId = @Model.ProductId;
+        const colorId = document.getElementById('colorId').value;
+        const sizeId = document.getElementById('sizeId').value;
+        
+        if (colorId && sizeId) {
+            const sku = `PRD${productId}-CLR${colorId}-SZ${sizeId}`;
+            document.getElementById('sku').value = sku;
+        }
+    }
+
+    // Show color preview
+    function updateColorPreview() {
+        const select = document.getElementById('colorId');
+        const selectedOption = select.options[select.selectedIndex];
+        const colorCode = selectedOption.getAttribute('data-color');
+        const preview = document.getElementById('colorPreview');
+        
+        if (colorCode) {
+            preview.innerHTML = `<div style="width: 40px; height: 40px; background-color: ${colorCode}; border-radius: 8px; border: 1px solid #ddd;"></div>`;
+        } else {
+            preview.innerHTML = '';
+        }
+        
+        updateSKU();
+    }
+
+    document.getElementById('colorId').addEventListener('change', updateColorPreview);
+    document.getElementById('sizeId').addEventListener('change', updateSKU);
+
+    function clearVariantForm() {
+        document.getElementById('variantForm').reset();
+        document.getElementById('variantId').value = '0';
+        document.getElementById('modalTitle').textContent = 'Thêm biến thể mới';
+        document.getElementById('saveBtn').innerHTML = '<i class="fas fa-save me-2"></i>Lưu';
+        document.getElementById('sku').value = '';
+        document.getElementById('colorPreview').innerHTML = '';
+        document.getElementById('price').value = @Model.Product?.BasePrice ?? 0;
+    }
+
+    async function editVariant(variantId) {
+        try {
+            const response = await fetch(`/Staff/ProductVariants?handler=GetVariant&id=${variantId}`);
+            const variant = await response.json();
+
+            document.getElementById('variantId').value = variant.variantId;
+            document.getElementById('colorId').value = variant.colorId;
+            document.getElementById('sizeId').value = variant.sizeId;
+            document.getElementById('price').value = variant.price;
+            document.getElementById('stockQuantity').value = variant.stockQuantity;
+            document.getElementById('sku').value = variant.sku;
+            document.getElementById('isActive').checked = variant.isActive;
+
+            updateColorPreview();
+
+            document.getElementById('modalTitle').textContent = 'Sửa biến thể';
+            document.getElementById('saveBtn').innerHTML = '<i class="fas fa-save me-2"></i>Cập nhật';
+
+            new bootstrap.Modal(document.getElementById('variantModal')).show();
+        } catch (error) {
+            alert('Lỗi khi tải thông tin biến thể');
+        }
+    }
+
+    async function deleteVariant(variantId, sku) {
+        if (!confirm(`Bạn có chắc muốn xóa biến thể "${sku}"?`)) {
+            return;
+        }
+
+        try {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            const response = await fetch(`/Staff/ProductVariants?handler=Delete&id=${variantId}`, {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': token
+                }
+            });
+
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Lỗi khi xóa biến thể');
+            }
+        } catch (error) {
+            alert('Lỗi khi xóa biến thể');
+        }
+    }
+
+    // Submit form with AJAX
+    document.getElementById('variantForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const variantId = document.getElementById('variantId').value;
+        const handler = variantId === '0' ? 'Create' : 'Update';
+        
+        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+        try {
+            const response = await fetch(`/Staff/ProductVariants?handler=${handler}`, {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': token
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                location.reload();
+            } else {
+                const error = await response.text();
+                alert(error || 'Lỗi khi lưu biến thể');
+            }
+        } catch (error) {
+            alert('Lỗi khi lưu biến thể');
+        }
+    });
+</script>
+}
