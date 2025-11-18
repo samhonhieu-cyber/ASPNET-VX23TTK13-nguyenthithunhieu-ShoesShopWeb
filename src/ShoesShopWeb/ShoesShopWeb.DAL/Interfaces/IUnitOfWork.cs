@@ -6,13 +6,13 @@ public interface IUnitOfWork : IDisposable
     IProductRepository Products { get; }
     ICategoryRepository Categories { get; }
     IOrderRepository Orders { get; }
+    ISizeRepository Sizes { get; }
+    IColorRepository Colors { get; }
     IRepository<Entity.Models.Cart> Carts { get; }
     IRepository<Entity.Models.CartItem> CartItems { get; }
     IRepository<Entity.Models.OrderItem> OrderItems { get; }
     IRepository<Entity.Models.Payment> Payments { get; }
     IRepository<Entity.Models.ProductVariant> ProductVariants { get; }
-    IRepository<Entity.Models.Color> Colors { get; }
-    IRepository<Entity.Models.Size> Sizes { get; }
     
     Task<int> SaveChangesAsync();
     Task BeginTransactionAsync();

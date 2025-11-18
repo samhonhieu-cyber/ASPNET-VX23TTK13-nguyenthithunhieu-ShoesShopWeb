@@ -19,26 +19,26 @@ public class UnitOfWork : IUnitOfWork
         Products = new ProductRepository(_context);
         Categories = new CategoryRepository(_context);
         Orders = new OrderRepository(_context);
+        Sizes = new SizeRepository(_context);
+        Colors = new ColorRepository(_context);
         Carts = new Repository<Cart>(_context);
         CartItems = new Repository<CartItem>(_context);
         OrderItems = new Repository<OrderItem>(_context);
         Payments = new Repository<Payment>(_context);
         ProductVariants = new Repository<ProductVariant>(_context);
-        Colors = new Repository<Color>(_context);
-        Sizes = new Repository<Size>(_context);
     }
 
     public IUserRepository Users { get; private set; }
     public IProductRepository Products { get; private set; }
     public ICategoryRepository Categories { get; private set; }
     public IOrderRepository Orders { get; private set; }
+    public ISizeRepository Sizes { get; private set; }
+    public IColorRepository Colors { get; private set; }
     public IRepository<Cart> Carts { get; private set; }
     public IRepository<CartItem> CartItems { get; private set; }
     public IRepository<OrderItem> OrderItems { get; private set; }
     public IRepository<Payment> Payments { get; private set; }
     public IRepository<ProductVariant> ProductVariants { get; private set; }
-    public IRepository<Color> Colors { get; private set; }
-    public IRepository<Size> Sizes { get; private set; }
 
     public async Task<int> SaveChangesAsync()
     {
