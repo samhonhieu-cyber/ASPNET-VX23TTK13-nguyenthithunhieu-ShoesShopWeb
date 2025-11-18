@@ -1,0 +1,229 @@
+@page
+@model ShoesShopWeb.Pages.Products.IndexModel
+@{
+    ViewData["Title"] = "Sản phẩm";
+    Layout = "~/Pages/Shared/_CustomerLayout.cshtml";
+}
+
+<!-- Product Banner Section -->
+<section class="product-banner">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="banner-title">Bộ Sưu Tập Giày Thời Trang</h1>
+                <p class="banner-subtitle">Khám phá hàng ngàn mẫu giày chính hãng với giá tốt nhất</p>
+                <div class="banner-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-shoe-prints"></i>
+                        <span><strong>@Model.TotalProducts+</strong> Sản phẩm</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-tag"></i>
+                        <span><strong>@Model.Categories.Count</strong> Danh mục</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-shipping-fast"></i>
+                        <span><strong>Miễn phí</strong> Vận chuyển</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center">
+                <div class="banner-illustration">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="container py-4">
+    <!-- Filter Bar Top -->
+    <div class="filter-section filter-section-horizontal mb-4">
+        <form method="get">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label for="keyword" class="form-label">Tìm kiếm</label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="keyword" 
+                           name="keyword" 
+                           value="@Model.Keyword" 
+                           placeholder="Nhập từ khóa..." />
+                </div>
+
+                <div class="col-md-3">
+                    <label for="categoryId" class="form-label">Danh mục</label>
+                    <select class="form-select" id="categoryId" name="categoryId">
+                        <option value="">Tất cả</option>
+                        @foreach (var category in Model.Categories)
+                        {
+                            <option value="@category.CategoryId" 
+                                    selected="@(Model.CategoryId == category.CategoryId)">
+                                @category.CategoryName
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Khoảng giá</label>
+                    <div class="price-range-inputs">
+                        <input type="number" 
+                               class="form-control" 
+                               id="minPrice" 
+                               name="minPrice" 
+                               value="@Model.MinPrice" 
+                               placeholder="Từ" 
+                               min="0" />
+                        <span>-</span>
+                        <input type="number" 
+                               class="form-control" 
+                               id="maxPrice" 
+                               name="maxPrice" 
+                               value="@Model.MaxPrice" 
+                               placeholder="Đến" 
+                               min="0" />
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <label for="sortBy" class="form-label">Sắp xếp</label>
+                    <select class="form-select" id="sortBy" name="sortBy">
+                        <option value="">Mặc định</option>
+                        <option value="name" selected="@(Model.SortBy == "name")">Tên A-Z</option>
+                        <option value="price-asc" selected="@(Model.SortBy == "price-asc")">Giá tăng dần</option>
+                        <option value="price-desc" selected="@(Model.SortBy == "price-desc")">Giá giảm dần</option>
+                        <option value="newest" selected="@(Model.SortBy == "newest")">Mới nhất</option>
+                    </select>
+                </div>
+
+                <input type="hidden" name="pageNumber" value="1" />
+
+                <div class="col-md-1 d-grid gap-2">
+                    <button type="submit" class="btn btn-primary" title="Áp dụng bộ lọc">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='@Url.Page("/Products/Index")'" title="Đặt lại">
+                        <i class="fas fa-redo"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="row">
+        <!-- Products Grid -->
+        <div class="col-12">
+            <!-- Results Info -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <p class="text-muted mb-0">
+                    Hiển thị <strong>@Model.Products.Count</strong> trong tổng số <strong>@Model.TotalProducts</strong> sản phẩm
+                </p>
+            </div>
+
+            <!-- Products -->
+            @if (Model.Products.Any())
+            {
+                <div class="row g-4">
+                    @foreach (var product in Model.Products)
+                    {
+                        <div class="col-md-6 col-lg-4">
+                            <div class="product-card">
+                                <a asp-page="/Products/Details" asp-route-id="@product.ProductId">
+                                    <div class="product-image-wrapper">
+                                        <img src="@(product.ImageUrl ?? "/images/placeholder.jpg")" 
+                                             alt="@product.ProductName" 
+                                             class="card-img-top"
+                                             onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22%3E%3Crect fill=%22%23f8f9fa%22 width=%22400%22 height=%22300%22/%3E%3Ctext fill=%22%23636e72%22 font-family=%22Arial%22 font-size=%2224%22 text-anchor=%22middle%22 x=%22200%22 y=%22150%22%3E%F0%9F%91%9F No Image%3C/text%3E%3C/svg%3E';" />
+                                    </div>
+                                </a>
+                                <div class="card-body">
+                                    <p class="product-category mb-2">@product.CategoryName</p>
+                                    <h5 class="product-title">
+                                        <a asp-page="/Products/Details" asp-route-id="@product.ProductId" 
+                                           class="text-decoration-none text-dark">
+                                            @product.ProductName
+                                        </a>
+                                    </h5>
+                                    <p class="product-price mb-3">@product.BasePrice.ToString("N0") đ</p>
+                                    <a asp-page="/Products/Details" asp-route-id="@product.ProductId" 
+                                       class="btn btn-primary w-100">
+                                        <i class="fas fa-eye me-2"></i>Xem chi tiết
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Pagination -->
+                @if (Model.TotalPages > 1)
+                {
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
+                                <a class="page-link" 
+                                   asp-page="/Products/Index"
+                                   asp-route-keyword="@Model.Keyword"
+                                   asp-route-categoryId="@Model.CategoryId"
+                                   asp-route-minPrice="@Model.MinPrice"
+                                   asp-route-maxPrice="@Model.MaxPrice"
+                                   asp-route-sortBy="@Model.SortBy"
+                                   asp-route-pageNumber="@(Model.PageNumber - 1)">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+
+                            @for (int i = 1; i <= Model.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                    <a class="page-link" 
+                                       asp-page="/Products/Index"
+                                       asp-route-keyword="@Model.Keyword"
+                                       asp-route-categoryId="@Model.CategoryId"
+                                       asp-route-minPrice="@Model.MinPrice"
+                                       asp-route-maxPrice="@Model.MaxPrice"
+                                       asp-route-sortBy="@Model.SortBy"
+                                       asp-route-pageNumber="@i">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : "")">
+                                <a class="page-link" 
+                                   asp-page="/Products/Index"
+                                   asp-route-keyword="@Model.Keyword"
+                                   asp-route-categoryId="@Model.CategoryId"
+                                   asp-route-minPrice="@Model.MinPrice"
+                                   asp-route-maxPrice="@Model.MaxPrice"
+                                   asp-route-sortBy="@Model.SortBy"
+                                   asp-route-pageNumber="@(Model.PageNumber + 1)">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                }
+            }
+            else
+            {
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle me-2"></i>Không tìm thấy sản phẩm phù hợp.
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .color-swatch {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 1px solid #ddd;
+        margin-right: 5px;
+        vertical-align: middle;
+    }
+</style>

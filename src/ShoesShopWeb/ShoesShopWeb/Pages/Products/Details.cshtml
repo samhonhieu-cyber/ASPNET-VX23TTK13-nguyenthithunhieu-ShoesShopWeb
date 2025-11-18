@@ -1,0 +1,316 @@
+@page "{id:int}"
+@model ShoesShopWeb.Pages.Products.DetailsModel
+@{
+    ViewData["Title"] = Model.Product.ProductName;
+    Layout = "~/Pages/Shared/_CustomerLayout.cshtml";
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-page="/Index">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a asp-page="/Products/Index">Sản phẩm</a></li>
+            <li class="breadcrumb-item active">@Model.Product.ProductName</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Product Images -->
+        <div class="col-lg-6 mb-4">
+            <div class="product-image-container">
+                <img src="@(Model.Product.ImageUrl ?? "/images/placeholder.jpg")" 
+                     alt="@Model.Product.ProductName" 
+                     class="img-fluid rounded shadow-sm main-product-image" 
+                     id="mainImage"
+                     onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 600 600%22%3E%3Crect fill=%22%23f8f9fa%22 width=%22600%22 height=%22600%22/%3E%3Ctext fill=%22%23636e72%22 font-family=%22Arial%22 font-size=%2232%22 text-anchor=%22middle%22 x=%22300%22 y=%22290%22%3E%F0%9F%91%9F Shoes Image%3C/text%3E%3Ctext fill=%22%23636e72%22 font-family=%22Arial%22 font-size=%2218%22 text-anchor=%22middle%22 x=%22300%22 y=%22330%22%3ENot Available%3C/text%3E%3C/svg%3E';" />
+            </div>
+        </div>
+
+        <!-- Product Info -->
+        <div class="col-lg-6">
+            <div class="product-details-info">
+                <p class="product-category mb-2">
+                    <i class="fas fa-tag me-1"></i>@Model.Product.CategoryName
+                </p>
+                <h1 class="product-title-detail mb-3">@Model.Product.ProductName</h1>
+                
+                <div class="product-price-detail mb-4">
+                    <span class="current-price">@Model.Product.BasePrice.ToString("N0") đ</span>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Product.Description))
+                {
+                    <div class="product-description mb-4">
+                        <h5>Mô tả sản phẩm</h5>
+                        <p class="text-muted">@Model.Product.Description</p>
+                    </div>
+                }
+
+                @if (Model.Product.Variants?.Any() == true)
+                {
+                    <form method="post" asp-page-handler="AddToCart">
+                        <!-- Size Selection -->
+                        <div class="mb-4">
+                            <h6 class="mb-3">Chọn kích cỡ:</h6>
+                            <div class="size-options">
+                                @foreach (var size in Model.Product.Variants.Select(v => new { v.SizeId, v.SizeValue }).Distinct())
+                                {
+                                    <button type="button" 
+                                            class="size-option" 
+                                            data-size-id="@size.SizeId"
+                                            onclick="selectSize(@size.SizeId)">
+                                        @size.SizeValue
+                                    </button>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Color Selection -->
+                        <div class="mb-4">
+                            <h6 class="mb-3">Chọn màu sắc:</h6>
+                            <div class="color-options">
+                                @foreach (var color in Model.Product.Variants.Select(v => new { v.ColorId, v.ColorName, v.ColorHexCode }).Distinct())
+                                {
+                                    <button type="button" 
+                                            class="color-option" 
+                                            data-color-id="@color.ColorId"
+                                            onclick="selectColor(@color.ColorId)"
+                                            title="@color.ColorName">
+                                        <span class="color-swatch" style="background-color: @(color.ColorHexCode ?? "#ccc")"></span>
+                                        @color.ColorName
+                                    </button>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Quantity -->
+                        <div class="mb-4">
+                            <h6 class="mb-3">Số lượng:</h6>
+                            <div class="quantity-control">
+                                <button type="button" class="quantity-minus" onclick="decreaseQuantity()">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <input type="number" 
+                                       id="quantity" 
+                                       name="quantity" 
+                                       class="form-control text-center" 
+                                       value="1" 
+                                       min="1" 
+                                       max="99" 
+                                       readonly />
+                                <button type="button" class="quantity-plus" onclick="increaseQuantity()">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted" id="stockInfo"></small>
+                        </div>
+
+                        <input type="hidden" id="selectedVariantId" name="variantId" value="" />
+
+                        <!-- Add to Cart Button -->
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <div class="d-grid gap-2">
+                                <button type="button" 
+                                        id="addToCartBtn" 
+                                        class="btn btn-primary btn-lg" 
+                                        onclick="addToCartFromDetails()"
+                                        disabled>
+                                    <i class="fas fa-shopping-cart me-2"></i>Thêm vào giỏ hàng
+                                </button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Vui lòng <a asp-page="/Account/Login" asp-route-returnUrl="@Url.Page("/Products/Details", new { id = Model.Product.ProductId })">đăng nhập</a> 
+                                để mua hàng.
+                            </div>
+                        }
+                    </form>
+                }
+                else
+                {
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Sản phẩm hiện không có sẵn.
+                    </div>
+                }
+
+                <!-- Product Features -->
+                <div class="product-features mt-4">
+                    <div class="feature-item">
+                        <i class="fas fa-shield-alt text-primary me-2"></i>
+                        <span>Bảo hành chính hãng</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-truck text-primary me-2"></i>
+                        <span>Miễn phí vận chuyển</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-undo text-primary me-2"></i>
+                        <span>Đổi trả trong 7 ngày</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    <div class="related-products mt-5">
+        <h3 class="section-title text-center mb-4">Sản phẩm liên quan</h3>
+        <!-- TODO: Implement related products -->
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const variants = @Html.Raw(Json.Serialize(Model.Product.Variants != null ? Model.Product.Variants : new List<ShoesShopWeb.ViewModels.ProductVariantViewModel>()));
+        let selectedSize = null;
+        let selectedColor = null;
+        let selectedVariant = null;
+
+        function selectSize(sizeId) {
+            selectedSize = sizeId;
+            document.querySelectorAll('.size-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector(`[data-size-id="${sizeId}"]`).classList.add('selected');
+            updateVariant();
+        }
+
+        function selectColor(colorId) {
+            selectedColor = colorId;
+            document.querySelectorAll('.color-option').forEach(opt => opt.classList.remove('selected'));
+            document.querySelector(`[data-color-id="${colorId}"]`).classList.add('selected');
+            updateVariant();
+        }
+
+        function updateVariant() {
+            if (selectedSize && selectedColor) {
+                selectedVariant = variants.find(v => v.sizeId === selectedSize && v.colorId === selectedColor);
+                
+                if (selectedVariant) {
+                    document.getElementById('selectedVariantId').value = selectedVariant.variantId;
+                    document.getElementById('addToCartBtn').disabled = !selectedVariant.isAvailable || selectedVariant.stockQuantity === 0;
+                    document.getElementById('quantity').max = selectedVariant.stockQuantity;
+                    document.getElementById('stockInfo').textContent = `Còn ${selectedVariant.stockQuantity} sản phẩm`;
+                    
+                    if (selectedVariant.price !== @Model.Product.BasePrice) {
+                        document.querySelector('.current-price').textContent = selectedVariant.price.toLocaleString('vi-VN') + ' đ';
+                    }
+                } else {
+                    document.getElementById('addToCartBtn').disabled = true;
+                    document.getElementById('stockInfo').textContent = 'Không có sẵn với kích cỡ và màu này';
+                }
+            }
+        }
+
+        function decreaseQuantity() {
+            const input = document.getElementById('quantity');
+            if (input.value > 1) {
+                input.value = parseInt(input.value) - 1;
+            }
+        }
+
+        function increaseQuantity() {
+            const input = document.getElementById('quantity');
+            const max = parseInt(input.max);
+            if (input.value < max) {
+                input.value = parseInt(input.value) + 1;
+            }
+        }
+
+        function addToCartFromDetails() {
+            const variantId = document.getElementById('selectedVariantId').value;
+            const quantity = document.getElementById('quantity').value;
+            
+            if (!variantId) {
+                alert('Vui lòng chọn kích cỡ và màu sắc');
+                return;
+            }
+            
+            addToCart(variantId, quantity);
+        }
+    </script>
+}
+
+<style>
+    .product-image-container {
+        position: sticky;
+        top: 100px;
+    }
+
+    .main-product-image {
+        width: 100%;
+        height: auto;
+        max-height: 600px;
+        object-fit: cover;
+    }
+
+    .product-title-detail {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+
+    .product-price-detail {
+        border-top: 1px solid var(--medium-gray);
+        border-bottom: 1px solid var(--medium-gray);
+        padding: 1.5rem 0;
+    }
+
+    .current-price {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--accent-color);
+    }
+
+    .size-options, .color-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .size-option, .color-option {
+        padding: 0.75rem 1.5rem;
+        border: 2px solid var(--medium-gray);
+        background-color: var(--white);
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        transition: var(--transition);
+        font-weight: 500;
+    }
+
+    .size-option:hover, .color-option:hover {
+        border-color: var(--secondary-color);
+    }
+
+    .size-option.selected, .color-option.selected {
+        border-color: var(--secondary-color);
+        background-color: var(--secondary-color);
+        color: var(--white);
+    }
+
+    .color-option {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .color-swatch {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 2px solid #ddd;
+    }
+
+    .product-features {
+        background-color: var(--light-gray);
+        padding: 1.5rem;
+        border-radius: var(--border-radius);
+    }
+
+    .feature-item {
+        padding: 0.5rem 0;
+        font-weight: 500;
+    }
+</style>
