@@ -29,6 +29,8 @@ public class ProductVariant
     
     public bool IsActive { get; set; } = true;
     
+    public bool IsAvailable => IsActive && StockQuantity > 0;
+    
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
     public DateTime? UpdatedAt { get; set; }
