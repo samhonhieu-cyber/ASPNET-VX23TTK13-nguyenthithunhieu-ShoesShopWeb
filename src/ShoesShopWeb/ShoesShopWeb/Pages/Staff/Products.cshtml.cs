@@ -30,7 +30,7 @@ public class ProductsModel : PageModel
             // Load related data
             foreach (var product in Products)
             {
-                product.Category = await _unitOfWork.Categories.GetByIdAsync(product.CategoryId);
+                product.Category = (await _unitOfWork.Categories.GetByIdAsync(product.CategoryId))!;
                 product.ProductVariants = (await _unitOfWork.ProductVariants.FindAsync(v => v.ProductId == product.ProductId)).ToList();
             }
             
