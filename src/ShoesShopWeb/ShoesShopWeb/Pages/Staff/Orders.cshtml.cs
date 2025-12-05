@@ -30,7 +30,7 @@ public class OrdersModel : PageModel
             // Load users
             foreach (var order in Orders)
             {
-                order.User = await _unitOfWork.Users.GetByIdAsync(order.UserId);
+                order.User = (await _unitOfWork.Users.GetByIdAsync(order.UserId))!;
             }
             
             // Sort by most recent first
