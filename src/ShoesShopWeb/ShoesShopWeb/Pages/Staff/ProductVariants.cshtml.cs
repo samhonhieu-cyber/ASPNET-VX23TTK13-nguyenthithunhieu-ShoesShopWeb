@@ -42,8 +42,8 @@ public class ProductVariantsModel : PageModel
             // Load related data for variants
             foreach (var variant in Variants)
             {
-                variant.Color = await _unitOfWork.Colors.GetByIdAsync(variant.ColorId);
-                variant.Size = await _unitOfWork.Sizes.GetByIdAsync(variant.SizeId);
+                variant.Color = (await _unitOfWork.Colors.GetByIdAsync(variant.ColorId))!;
+                variant.Size = (await _unitOfWork.Sizes.GetByIdAsync(variant.SizeId))!;
             }
 
             Colors = await _unitOfWork.Colors.FindAsync(c => c.IsActive);
