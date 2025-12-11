@@ -1,103 +1,139 @@
-# Báo cáo tiến độ - Tuần 05 (FINAL)
+# Báo Cáo Tiến Độ Tuần 05 (FINAL)
 
-**Sinh viên:** Nguyễn Thị Thu Nhiều  
-**Dự án:** ShoesShopWeb - Hệ thống bán giày trực tuyến  
-**Thời gian:** Tuần 05 (06/12/2025 - 12/12/2025)  
-**Công nghệ:** ASP.NET Core 9.0 Razor Pages, PostgreSQL, Bootstrap 5
-
----
-
-## 🎯 Tổng quan công việc
-
-Tuần 05 là **tuần cuối cùng** của dự án, tập trung vào **hoàn thiện code**, **sửa lỗi còn tồn đọng**, **testing toàn diện**, và **chuẩn bị báo cáo cuối kỳ**. Đây là giai đoạn polish và finalize toàn bộ dự án.
+**Sinh viên:** Nguyễn Thị Thu Nhiêu  
+**Lớp:** VX23TTK13  
+**Tuần:** 05 (06/12/2025 - 12/12/2025)  
+**Đồ án:** Website Bán Giày Online (ShoesShopWeb)
 
 ---
 
-## ✅ Công việc đã hoàn thành
+## Công Việc Đã Hoàn Thành
 
-### 1. **Bug Fixes - Sửa lỗi còn tồn đọng**
+### 1. Bug Fixes - Sửa lỗi còn tồn đọng
 
-#### **A. Nullable Reference Warnings (4 lỗi - ✅ FIXED)**
+**Nullable Reference Warnings (4 lỗi):**
 
-Đã sửa hoàn toàn 4 lỗi compiler warnings về nullable reference:
+- `Pages/Staff/Products.cshtml.cs:33`: Thêm null-forgiving operator `!` cho Category
+- `Pages/Staff/Orders.cshtml.cs:33`: Thêm null-forgiving operator `!` cho User
+- `Pages/Staff/ProductVariants.cshtml.cs:45-46`: Thêm null-forgiving operator `!` cho Color và Size
 
-1. **`Pages/Staff/Products.cshtml.cs:33`** ✅
+**Kết quả:**
 
-   ```csharp
-   // BEFORE (Warning)
-   product.Category = await _unitOfWork.Categories.GetByIdAsync(product.CategoryId);
+- 0 Compiler Warnings (giảm từ 4 xuống 0)
+- 0 Compiler Errors
+- Build Success
 
-   // AFTER (Fixed)
-   product.Category = (await _unitOfWork.Categories.GetByIdAsync(product.CategoryId))!;
-   ```
+### 2. Code Quality Improvements
 
-   - **Lý do:** Category luôn tồn tại vì CategoryId là Foreign Key có constraint
-   - **Giải pháp:** Thêm null-forgiving operator `!`
+**Code Review & Cleanup:**
 
-2. **`Pages/Staff/Orders.cshtml.cs:33`** ✅
+- Remove unused imports, code clutter
+- Consistent formatting: indentation (4 spaces), naming conventions
+- Add XML comments cho public methods
+- Code organization: nhóm related methods, separation of concerns
 
-   ```csharp
-   // BEFORE (Warning)
-   order.User = await _unitOfWork.Users.GetByIdAsync(order.UserId);
+**Performance Optimization:**
 
-   // AFTER (Fixed)
-   order.User = (await _unitOfWork.Users.GetByIdAsync(order.UserId))!;
-   ```
+- Optimize database queries với AsNoTracking
+- Reduce N+1 queries với eager loading
+- Cache static data (categories, colors, sizes)
+- Optimize JavaScript (debounce search, lazy load images)
 
-   - **Lý do:** User luôn tồn tại vì UserId là Foreign Key có constraint
-   - **Giải pháp:** Thêm null-forgiving operator `!`
+### 3. Final Testing
 
-3. **`Pages/Staff/ProductVariants.cshtml.cs:45-46`** ✅
+**Regression Testing:**
 
-   ```csharp
-   // BEFORE (2 Warnings)
-   variant.Color = await _unitOfWork.Colors.GetByIdAsync(variant.ColorId);
-   variant.Size = await _unitOfWork.Sizes.GetByIdAsync(variant.SizeId);
+- Re-test tất cả features sau bug fixes
+- Verify tất cả CRUD operations hoạt động
+- Test edge cases (empty cart, out of stock, invalid inputs)
 
-   // AFTER (Fixed)
-   variant.Color = (await _unitOfWork.Colors.GetByIdAsync(variant.ColorId))!;
-   variant.Size = (await _unitOfWork.Sizes.GetByIdAsync(variant.SizeId))!;
-   ```
+**User Acceptance Testing:**
 
-   - **Lý do:** Color và Size luôn tồn tại vì ColorId/SizeId là Foreign Keys
-   - **Giải pháp:** Thêm null-forgiving operator `!` cho cả 2 dòng
+- Test workflows từ đầu đến cuối (browse → cart → checkout → order)
+- Test admin workflows (product management, order management)
+- Verify UI/UX smoothness
 
-#### **Kết quả:**
+**Load Testing (basic):**
 
-- ✅ **0 Compiler Warnings** (giảm từ 4 xuống 0)
-- ✅ **0 Compiler Errors**
-- ✅ **Build Success**
-- ✅ Verified bằng `get_errors` tool: "No errors found"
+- Test với 10 concurrent users
+- Verify response time < 2s cho most pages
+- Check database connection pooling
+
+### 4. Documentation Final
+
+**Cập nhật tài liệu:**
+
+- README.md: Hướng dẫn cài đặt đầy đủ, screenshots
+- CHANGELOG.md: Ghi lại tất cả thay đổi theo tuần
+- API_DOCUMENTATION.md: AJAX endpoints documentation
+- USER_GUIDE.md: Hướng dẫn sử dụng cho end users
+- DEPLOYMENT_GUIDE.md: Hướng dẫn deploy
+
+**Code Comments:**
+
+- Add comments cho business logic phức tạp
+- Document validation rules
+- Explain transaction handling
+
+### 5. Chuẩn bị báo cáo cuối kỳ
+
+**Viết báo cáo:**
+
+- Chương 1: Giới thiệu (mục tiêu, phạm vi, công nghệ)
+- Chương 2: Phân tích yêu cầu (use cases, user stories)
+- Chương 3: Thiết kế hệ thống (kiến trúc N-Layer, database schema, UI mockups)
+- Chương 4: Kết quả nghiên cứu (mô tả luồng chức năng từ góc nhìn user, 37 image placeholders)
+- Chương 5: Kết luận và hướng phát triển
+
+**Thu thập Screenshots:**
+
+- Chụp 37 screenshots theo ghi chú trong Chapter 4
+- Đảm bảo hiển thị URL, timestamp, user role
+- Screenshots cho customer flows (5 flows) và admin flows (5 flows)
+
+### 6. Final Polish
+
+**UI/UX Improvements:**
+
+- Fix minor CSS issues (spacing, alignment)
+- Improve loading states và transitions
+- Add helpful tooltips
+- Enhance error messages clarity
+
+**Security Final Check:**
+
+- Verify CSRF protection trên tất cả forms
+- Check authorization trên sensitive pages
+- Validate all user inputs
+- Test SQL injection prevention
 
 ---
 
-### 2. **Code Quality Improvements**
+## Tổng Kết Dự Án
 
-#### **A. Code Review & Cleanup**
+**Thành tựu:**
 
-Đã review toàn bộ codebase và thực hiện cleanup:
+- Hoàn thành 100% chức năng theo yêu cầu
+- 0 Compiler Errors, 0 Warnings
+- Pass tất cả test cases
+- Documentation đầy đủ
+- Code quality tốt, maintainable
 
-1. **Removed unused imports** ✅
-   - Remove các `using` statements không dùng đến
-   - Reduced code clutter
-2. **Consistent formatting** ✅
+**Công nghệ sử dụng:**
 
-   - Indentation consistent (4 spaces)
-   - Naming conventions consistent (PascalCase for properties, camelCase for variables)
-   - Code style unified across all files
+- ASP.NET Core 9.0 Razor Pages
+- Entity Framework Core 9.0
+- PostgreSQL 16 (Docker)
+- Bootstrap 5, jQuery
+- N-Layer Architecture (4 layers)
 
-3. **Added XML comments** ✅
+**Số liệu thống kê:**
 
-   - Document public methods
-   - Explain complex logic
-   - Improve code maintainability
-
-4. **Code organization** ✅
-   - Related methods grouped together
-   - Clear separation of concerns
-   - Proper error handling
-
-#### **B. Performance Verification**
+- 11 Models, 4 Projects
+- 20+ Razor Pages
+- 10 Services, 11 Repositories
+- 8 ViewModels
+- 37 Screenshots cho báo cáo
 
 Verified các optimization đã implement trong Week 04:
 

@@ -1,102 +1,90 @@
-# Báo cáo tiến độ - Tuần 04
+# Báo Cáo Tiến Độ Tuần 04
 
-**Sinh viên:** Nguyễn Thị Thu Nhiều  
-**Dự án:** ShoesShopWeb - Hệ thống bán giày trực tuyến  
-**Thời gian:** Tuần 04 (19/11/2025 - 05/12/2025)  
-**Công nghệ:** ASP.NET Core 9.0 Razor Pages, PostgreSQL, Bootstrap 5
-
----
-
-## 📋 Tổng quan công việc
-
-Trong tuần 04, công việc tập trung vào **testing toàn diện**, **sửa lỗi phát hiện**, **tối ưu hóa code**, và **viết documentation đầy đủ** cho dự án. Đây là giai đoạn hoàn thiện và chuẩn bị cho deployment.
+**Sinh viên:** Nguyễn Thị Thu Nhiêu  
+**Lớp:** VX23TTK13  
+**Tuần:** 04 (19/11/2025 - 05/12/2025)  
+**Đồ án:** Website Bán Giày Online (ShoesShopWeb)
 
 ---
 
-## ✅ Công việc đã hoàn thành
+## Công Việc Đã Hoàn Thành
 
-### 1. **Testing & Quality Assurance**
+### 1. Testing & Quality Assurance
 
-#### **Unit Testing**
+**Unit Testing:**
 
-- ✅ Test tất cả Service layer methods
-- ✅ Test Repository operations
-- ✅ Test PasswordHasher utility
-- ✅ Coverage: ~75% code coverage
+- Test Service layer methods, Repository operations, PasswordHasher utility
+- Code coverage: ~75%
 
-#### **Integration Testing**
+**Integration Testing:**
 
-- ✅ Test full user registration flow
-- ✅ Test login/logout cycle
-- ✅ Test product creation với variants
-- ✅ Test order placement flow (Pending → Processing)
-- ✅ Test cart operations (add, update, remove)
+- Test user registration flow, login/logout cycle
+- Test product creation với variants, order placement flow
+- Test cart operations (add, update, remove)
 
-#### **UI/UX Testing**
+**UI/UX Testing:**
 
-- ✅ Test responsive design trên mobile/tablet/desktop
-- ✅ Test tất cả forms với valid/invalid data
-- ✅ Test modal popups (Categories, Products, Variants)
-- ✅ Test AJAX operations không reload page
-- ✅ Test navigation links trên tất cả pages
-- ✅ Test authentication & authorization flows
-- ✅ Test role-based access (Customer, Staff, Admin)
+- Test responsive design (mobile/tablet/desktop)
+- Test forms validation, modal popups, AJAX operations
+- Test navigation, authentication & authorization flows
+- Test role-based access (Customer, Staff, Admin)
 
-#### **Browser Compatibility Testing**
+**Browser Compatibility:**
 
-- ✅ Chrome (latest) - Pass
-- ✅ Firefox (latest) - Pass
-- ✅ Safari (latest) - Pass
-- ✅ Edge (latest) - Pass
+- Chrome, Firefox, Safari, Edge (latest versions) - Pass
 
-#### **Database Testing**
+**Database Testing:**
 
-- ✅ Test migrations chạy thành công
-- ✅ Test seed data tạo đúng
-- ✅ Test relationships (Foreign Keys)
-- ✅ Test cascading deletes
-- ✅ Test unique constraints
+- Test migrations, seed data, relationships (Foreign Keys)
+- Test cascading deletes, unique constraints
+
+### 2. Bug Fixes
+
+- **Cart Badge Count không cập nhật**: Thêm `updateCartCount()` trong DOMContentLoaded
+- **Product Details không hiển thị variants**: Eager loading trong GetProductWithDetailsAsync
+- **Modal popup không clear form**: Thêm clearForm() cho tất cả modals
+- **SKU không auto-generate**: Gọi updateSKU() trong color/size change event
+- **Order status transition validation**: Implement IsValidStatusTransition()
+- **Cart operations AJAX errors**: Kiểm tra null, trả về error messages rõ ràng
+- **Image upload validation**: Kiểm tra file size, format (jpg, png, webp)
+- **Pagination không hoạt động**: Fix query parameters trong page links
+- **Stock quantity âm**: Validation trong UpdateQuantity và Checkout
+- **Duplicate variant creation**: Kiểm tra unique constraint (ProductId, SizeId, ColorId)
+
+### 3. Code Optimization
+
+- Refactor repeated code thành helper methods
+- Optimize database queries với AsNoTracking cho read-only
+- Eager loading relationships để giảm N+1 queries
+- Cache categories, colors, sizes trong memory
+- Optimize JavaScript với debounce cho search
+- Minify CSS và JavaScript files
+- Lazy loading cho hình ảnh sản phẩm
+
+### 4. Documentation
+
+- Cập nhật README.md với hướng dẫn đầy đủ
+- Viết CHANGELOG.md ghi lại tất cả thay đổi
+- Thêm code comments cho logic phức tạp
+- Tạo API documentation cho AJAX endpoints
+- Viết USER_GUIDE.md cho end users
+
+### 5. Security Improvements
+
+- Implement CSRF protection cho tất cả POST requests
+- Add input validation và sanitization
+- Hash passwords với SHA256
+- Implement rate limiting cho login attempts
+- Add authorization checks cho tất cả staff pages
 
 ---
 
-### 2. **Bug Fixes & Improvements**
+## Kế Hoạch Tuần 05
 
-#### **Bugs Đã Sửa:**
-
-1. **Cart Badge Count không cập nhật**
-
-   - Vấn đề: Badge hiển thị 0 dù đã có items
-   - Nguyên nhân: JavaScript chưa gọi API GetCartCount
-   - Giải pháp: Thêm `updateCartCount()` trong DOMContentLoaded
-   - Status: ✅ Fixed
-
-2. **Product Details không hiển thị variants**
-
-   - Vấn đề: Dropdown size/color trống
-   - Nguyên nhân: Related data chưa được load (Color, Size)
-   - Giải pháp: Eager loading trong GetProductWithDetailsAsync
-   - Status: ✅ Fixed
-
-3. **Modal popup không clear form khi đóng**
-
-   - Vấn đề: Data cũ vẫn còn khi mở lại modal
-   - Nguyên nhân: Thiếu clearForm() function
-   - Giải pháp: Thêm clearForm() cho tất cả modals
-   - Status: ✅ Fixed
-
-4. **SKU không auto-generate khi thêm variant**
-
-   - Vấn đề: SKU field trống
-   - Nguyên nhân: JavaScript không trigger updateSKU()
-   - Giải pháp: Gọi updateSKU() trong color/size change event
-   - Status: ✅ Fixed
-
-5. **Order status transition validation**
-
-   - Vấn đề: Có thể chuyển status bất kỳ
-   - Nguyên nhân: Thiếu validation logic
-   - Giải pháp: Implement IsValidStatusTransition()
-   - Status: ✅ Fixed
+- Sửa lỗi còn tồn đọng
+- Final testing và polish UI
+- Chuẩn bị báo cáo cuối kỳ
+- Deploy lên production (nếu có)
 
 6. **Delete variant bị lỗi khi có trong cart**
 

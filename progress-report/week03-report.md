@@ -1,103 +1,80 @@
-# Báo cáo tiến độ - Tuần 03
+# Báo Cáo Tiến Độ Tuần 03
 
-**Sinh viên:** Nguyễn Thị Thu Nhiều  
-**Dự án:** ShoesShopWeb - Hệ thống bán giày trực tuyến  
-**Thời gian:** Tuần 03  
-**Công nghệ:** ASP.NET Core 9.0 Razor Pages, PostgreSQL, Bootstrap 5
-
----
-
-## 📋 Tổng quan công việc
-
-Trong tuần này, dự án đã được hoàn thiện với việc xây dựng đầy đủ hệ thống quản lý cho nhân viên (Staff Management) và hoàn thiện giao diện khách hàng. Tất cả các tính năng CRUD đã được triển khai với Razor Pages và AJAX.
+**Sinh viên:** Nguyễn Thị Thu Nhiêu  
+**Lớp:** VX23TTK13  
+**Tuần:** 03  
+**Đồ án:** Website Bán Giày Online (ShoesShopWeb)
 
 ---
 
-## ✅ Công việc đã hoàn thành
+## Công Việc Đã Hoàn Thành
 
-### 1. **Tạo ViewModels cho toàn bộ hệ thống**
-- ✅ `CartViewModel.cs` - Quản lý giỏ hàng và các mục trong giỏ
-- ✅ `CategoryViewModel.cs` - Hiển thị và validation danh mục
-- ✅ `ProductViewModel.cs` - Hiển thị sản phẩm và biến thể
-- ✅ `ProductFilterViewModel.cs` - Lọc và phân trang sản phẩm
-- ✅ `OrderViewModel.cs` - Quản lý đơn hàng và thanh toán
-- ✅ `DashboardViewModel.cs` - Thống kê dashboard
-- ✅ `LoginViewModel.cs` & `RegisterViewModel.cs` - Xác thực
-- ✅ `UserManagementViewModel.cs` - Quản lý người dùng
+### 1. Tạo ViewModels
 
-**Kết quả:** Tất cả các ViewModel đều có validation attributes và được tối ưu cho Razor Pages.
+- `CartViewModel` - Quản lý giỏ hàng và các mục trong giỏ
+- `CategoryViewModel` - Hiển thị và validation danh mục
+- `ProductViewModel` - Hiển thị sản phẩm và biến thể
+- `ProductFilterViewModel` - Lọc và phân trang sản phẩm
+- `OrderViewModel` - Quản lý đơn hàng và thanh toán
+- `DashboardViewModel` - Thống kê dashboard
+- `LoginViewModel` & `RegisterViewModel` - Xác thực
+- `UserManagementViewModel` - Quản lý người dùng
 
----
+### 2. Giao diện khách hàng (Customer Pages)
 
-### 2. **Giao diện khách hàng (Customer Pages)**
+**Trang sản phẩm:**
 
-#### **Trang sản phẩm**
-- ✅ `/Products/Index.cshtml` - Danh sách sản phẩm với bộ lọc
-  - Tìm kiếm theo từ khóa
-  - Lọc theo danh mục, khoảng giá
-  - Sắp xếp (giá, tên, mới nhất)
-  - Phân trang với 12 sản phẩm/trang
-  - Banner thống kê động
-  
-- ✅ `/Products/Details.cshtml.cs` - Chi tiết sản phẩm
-  - Hiển thị thông tin đầy đủ
-  - Chọn màu sắc và kích cỡ
-  - Kiểm tra tồn kho
-  - Nút thêm vào giỏ hàng
+- `/Products/Index`: Danh sách sản phẩm với tìm kiếm, lọc (danh mục, khoảng giá), sắp xếp, phân trang (12 sản phẩm/trang)
+- `/Products/Details`: Chi tiết sản phẩm, chọn màu sắc và kích cỡ, kiểm tra tồn kho, thêm vào giỏ
 
-**Tính năng nổi bật:**
-- UI responsive với card design hiện đại
-- Filter ngang tiện lợi
-- Placeholder image SVG khi không có ảnh
-- Color swatch preview
+**Trang giỏ hàng:**
 
----
+- `/Cart/Index`: Xem giỏ hàng, cập nhật số lượng, xóa sản phẩm, tính tổng tiền
 
-### 3. **Layouts và Styling**
+**Trang đơn hàng:**
 
-#### **Customer Layout**
-- ✅ `_CustomerLayout.cshtml` - Layout cho khách hàng
-  - Navbar với dropdown user menu
-  - Cart badge hiển thị số lượng
-  - Footer thông tin liên hệ
-  - Responsive mobile-friendly
+- `/Orders/Checkout`: Form nhập thông tin giao hàng, xem tóm tắt đơn hàng
+- `/Orders/MyOrders`: Xem lịch sử đơn hàng
 
-#### **Staff Layout**
-- ✅ `_StaffLayout.cshtml` - Layout cho nhân viên
-  - Sidebar navigation cố định
-  - Top bar với user info
-  - Collapsible sidebar cho mobile
-  - Quick links đến tất cả module quản lý
+### 3. Layouts và Styling
 
-#### **CSS Themes**
-- ✅ `customer.css` - White & Gray minimalist theme
-  - Color scheme: `#2d3436` (primary), `#f8f9fa` (background)
-  - Smooth transitions và hover effects
-  - Cart quantity buttons styled (36x36px)
-  - Override Bootstrap `.text-primary` thành màu đen thay vì xanh
-  - Card shadows và border radius 12px
-  
-- ✅ `staff.css` - Functional admin theme
-  - Dark sidebar với `#2c3e50`
-  - Clean table design
-  - Stat cards với icons
-  - Action buttons grouped
+**Layouts:**
 
-#### **JavaScript**
-- ✅ `customer.js` - Cart operations, filters, notifications
-- ✅ `staff.js` - Sidebar toggle, AJAX operations, DataTables
+- `_CustomerLayout.cshtml`: Navbar với dropdown user menu, cart badge, footer responsive
+- `_StaffLayout.cshtml`: Sidebar navigation cố định, top bar, collapsible sidebar
+
+**CSS Themes:**
+
+- `customer.css`: White & Gray minimalist theme, smooth transitions, cart buttons (36x36px)
+- `staff.css`: Dark sidebar (#2c3e50), clean table design, stat cards
+
+**JavaScript:**
+
+- `customer.js`: Cart operations, filters, notifications
+- `staff.js`: Sidebar toggle, AJAX operations
+
+### 4. Staff Management Pages
+
+- `/Staff/Index`: Dashboard với 4 stat cards (Sản phẩm, Khách hàng, Danh mục, Đơn hàng)
+- `/Staff/Products`: Quản lý sản phẩm (CRUD với modal)
+- `/Staff/Categories`: Quản lý danh mục
+- `/Staff/ProductVariants`: Quản lý biến thể (size, color, stock)
+- `/Staff/Orders`: Quản lý đơn hàng, cập nhật trạng thái
+
+### 5. Authentication & Authorization
+
+- `/Account/Login`: Đăng nhập
+- `/Account/Register`: Đăng ký
+- Role-based authorization: Customer, Staff, Admin
 
 ---
 
-### 4. **Staff Dashboard**
+## Kế Hoạch Tuần 04
 
-- ✅ `/Staff/Index.cshtml` - Dashboard tổng quan
-  - 4 stat cards: Sản phẩm, Khách hàng, Danh mục, Đơn hàng
-  - Quick actions links
-  - Welcome message và activity log placeholder
-
-**Thống kê hiển thị:**
-- Tổng số sản phẩm và số sản phẩm đang hoạt động
+- Testing toàn diện (Unit, Integration, UI/UX)
+- Sửa lỗi phát hiện
+- Tối ưu hóa code và performance
+- Viết documentation đầy đủ
 - Tổng số khách hàng
 - Tổng số danh mục đang hoạt động
 
@@ -115,6 +92,7 @@ Trong tuần này, dự án đã được hoàn thiện với việc xây dựng
     - `OnGetGetCategoryAsync()` - Lấy thông tin cho edit
 
 **Tính năng:**
+
 - Modal form với validation
 - AJAX submit không reload trang
 - Delete protection (kiểm tra có sản phẩm)
@@ -131,14 +109,16 @@ Trong tuần này, dự án đã được hoàn thiện với việc xây dựng
   - Filter theo danh mục và search
   - Hiển thị tổng tồn kho từ variants
   - Button "Quản lý biến thể" link đến ProductVariants
-  
+
 **Handler methods:**
+
 - `OnPostCreateAsync()` - Tạo sản phẩm
 - `OnPostUpdateAsync()` - Cập nhật sản phẩm
 - `OnPostDeleteAsync()` - Xóa (kiểm tra variants)
 - `OnGetGetProductAsync()` - Load thông tin edit
 
 **Fields:**
+
 - ProductName, Description, CategoryId
 - BasePrice, ImageUrl, IsActive
 
@@ -151,11 +131,12 @@ Trong tuần này, dự án đã được hoàn thiện với việc xây dựng
   - Breadcrumb navigation từ Products page
   - Table hiển thị: SKU, Màu (với preview box), Size, Giá, Tồn kho, Trạng thái
   - Modal form với dropdown màu sắc và kích cỡ
-  
+
 **Tính năng đặc biệt:**
+
 - ✅ **Auto-generate SKU:** `PRD{productId}-CLR{colorId}-SZ{sizeId}`
 - ✅ **Color preview box:** Hiển thị màu thực tế từ ColorCode
-- ✅ **Stock badges:** 
+- ✅ **Stock badges:**
   - Green (>10), Yellow (1-10), Red (0)
 - ✅ **Validation:** Không cho phép trùng combination (Product + Color + Size)
 - ✅ **Delete protection:**
@@ -164,6 +145,7 @@ Trong tuần này, dự án đã được hoàn thiện với việc xây dựng
 - ✅ **Tổng tồn kho** hiển thị ở footer table
 
 **Handler methods:**
+
 - `OnGetAsync()` - Load variants cho 1 product
 - `OnPostCreateAsync()` - Tạo variant với SKU auto-gen
 - `OnPostUpdateAsync()` - Update variant (re-validate unique)
@@ -171,6 +153,7 @@ Trong tuần này, dự án đã được hoàn thiện với việc xây dựng
 - `OnGetGetVariantAsync()` - Get variant details cho edit
 
 **JavaScript features:**
+
 - Auto-update SKU khi chọn color/size
 - Color preview realtime
 - AJAX form submission
@@ -190,10 +173,12 @@ Trong tuần này, dự án đã được hoàn thiện với việc xây dựng
   - Toggle active/inactive status
 
 **Handler methods:**
+
 - `OnGetGetCustomerAsync()` - Load chi tiết khách hàng
 - `OnPostToggleStatusAsync()` - Bật/tắt trạng thái
 
 **JavaScript features:**
+
 - Filter realtime không reload
 - AJAX toggle status với confirm dialog
 
@@ -217,11 +202,13 @@ Trong tuần này, dự án đã được hoàn thiện với việc xây dựng
     - Bất kỳ → Cancelled
 
 **Handler methods:**
+
 - `OnGetGetOrderAsync()` - Load order với items
 - `OnPostUpdateStatusAsync()` - Cập nhật trạng thái
 - `IsValidStatusTransition()` - Validate chuyển trạng thái hợp lệ
 
 **Enum OrderStatus:**
+
 ```csharp
 Pending = 0      // Chờ thanh toán
 Processing = 1   // Đã xác nhận
@@ -235,6 +222,7 @@ Cancelled = 4    // Đã hủy
 ## 🎨 Cải tiến UI/UX
 
 ### **Theme chính: White & Gray**
+
 - Không sử dụng màu xanh Bootstrap
 - Primary color: `#2d3436` (dark gray/black)
 - Background: `#f8f9fa` (light gray)
@@ -242,6 +230,7 @@ Cancelled = 4    // Đã hủy
 - Cards: White với shadow mềm
 
 ### **Cart buttons enhancement**
+
 - Quantity +/- buttons: 36x36px
 - Border radius: 8px
 - Hover effect: background chuyển sang primary color
@@ -249,11 +238,13 @@ Cancelled = 4    // Đã hủy
 - Box shadow khi hover
 
 ### **Color preview trong Product Variants**
+
 - 24x24px color box với border-radius 4px
 - Border 1px solid #ddd
 - Hiển thị trong table và dropdown select
 
 ### **Badges thống nhất**
+
 - Stock badges: color-coded theo số lượng
 - Status badges: Green (active), Secondary (inactive)
 - Order status badges: Warning, Info, Primary, Success, Danger
@@ -263,24 +254,28 @@ Cancelled = 4    // Đã hủy
 ## 🔧 Kiến trúc kỹ thuật
 
 ### **Razor Pages Pattern**
+
 - Mỗi page có `.cshtml` (view) và `.cshtml.cs` (code-behind)
 - Handler methods: `OnGet`, `OnPost`, `OnGetGetX`, `OnPostCreate`, `OnPostUpdate`, `OnPostDelete`
 - `[BindProperty]` cho form binding
 - `[Authorize(Roles = "Staff,Admin")]` cho staff pages
 
 ### **AJAX Operations**
+
 - Fetch API với `RequestVerificationToken`
 - JSON responses cho modal load
 - No page reload cho better UX
 - Success/Error notifications
 
 ### **Modal Forms**
+
 - Bootstrap 5 modal component
 - Clear form function trước khi mở
 - Dual mode: Add (id=0) vs Edit (id>0)
 - AJAX submit với FormData
 
 ### **Security**
+
 - Anti-forgery tokens trong forms
 - Authorization attributes
 - Role-based access (Customer, Staff, Admin)
@@ -322,6 +317,7 @@ Categories → Products (1-N)
 ## 🧪 Testing đã thực hiện
 
 ### **Functionality Testing**
+
 - ✅ CRUD operations cho tất cả entities
 - ✅ Validation rules (unique variants, delete protection)
 - ✅ Order status transitions
@@ -330,6 +326,7 @@ Categories → Products (1-N)
 - ✅ Modal forms (add/edit modes)
 
 ### **UI Testing**
+
 - ✅ Responsive trên mobile/tablet/desktop
 - ✅ Color preview display
 - ✅ Button hover effects
@@ -337,6 +334,7 @@ Categories → Products (1-N)
 - ✅ Modal open/close animations
 
 ### **Build Status**
+
 ```bash
 dotnet build
 Build succeeded.
@@ -349,6 +347,7 @@ Build succeeded.
 ## 📝 Các file được tạo/sửa đổi
 
 ### **ViewModels (8 files)**
+
 - CartViewModel.cs
 - CategoryViewModel.cs
 - ProductViewModel.cs
@@ -359,10 +358,12 @@ Build succeeded.
 - UserManagementViewModel.cs
 
 ### **Customer Pages (3 files)**
+
 - Products/Index.cshtml + Index.cshtml.cs
 - Products/Details.cshtml.cs
 
 ### **Staff Pages (10 files)**
+
 - Staff/Index.cshtml + Index.cshtml.cs
 - Staff/Categories.cshtml + Categories.cshtml.cs
 - Staff/Products.cshtml + Products.cshtml.cs
@@ -371,8 +372,9 @@ Build succeeded.
 - Staff/Orders.cshtml + Orders.cshtml.cs
 
 ### **Layouts & Assets (6 files)**
-- Shared/_CustomerLayout.cshtml
-- Shared/_StaffLayout.cshtml
+
+- Shared/\_CustomerLayout.cshtml
+- Shared/\_StaffLayout.cshtml
 - wwwroot/css/customer.css (~430 lines)
 - wwwroot/css/staff.css (~280 lines)
 - wwwroot/js/customer.js (~210 lines)
@@ -384,20 +386,21 @@ Build succeeded.
 
 ## 📈 Thống kê mã nguồn
 
-| Loại file | Số lượng | Dòng code (ước tính) |
-|-----------|----------|----------------------|
-| `.cshtml` | 9 | ~1,800 |
-| `.cshtml.cs` | 9 | ~1,500 |
-| `.cs` (ViewModels) | 8 | ~400 |
-| `.css` | 2 | ~710 |
-| `.js` | 2 | ~390 |
-| **TỔNG** | **30** | **~4,800 dòng** |
+| Loại file          | Số lượng | Dòng code (ước tính) |
+| ------------------ | -------- | -------------------- |
+| `.cshtml`          | 9        | ~1,800               |
+| `.cshtml.cs`       | 9        | ~1,500               |
+| `.cs` (ViewModels) | 8        | ~400                 |
+| `.css`             | 2        | ~710                 |
+| `.js`              | 2        | ~390                 |
+| **TỔNG**           | **30**   | **~4,800 dòng**      |
 
 ---
 
 ## 🎯 Mục tiêu tuần tới
 
 ### **Week 04 - Integration & Polish**
+
 1. 📝 Hoàn thiện trang Checkout flow
 2. 📝 Thêm Order Confirmation page
 3. 📝 Implement Cart page với AJAX
@@ -429,4 +432,4 @@ Tuần 03 đã hoàn thành xuất sắc với việc xây dựng đầy đủ h
 
 **Người báo cáo:** Nguyễn Thị Thu Nhiều  
 **Ngày:** 18/11/2025  
-**Chữ ký:** _________________
+**Chữ ký:** ********\_********

@@ -7,100 +7,55 @@
 
 ---
 
-## 📋 Công Việc Đã Hoàn Thành
+## Công Việc Đã Hoàn Thành
 
-### 1. Repository Pattern Implementation ✅
+### 1. Repository Pattern Implementation
 
-**Generic Repository:**
-- Tạo `IRepository<T>` interface với các operations cơ bản
-- Implement `Repository<T>` với đầy đủ CRUD operations
-- Hỗ trợ async/await patterns
-- Tích hợp với Entity Framework Core
+- Tạo Generic Repository: `IRepository<T>` và `Repository<T>` với CRUD operations, async/await
+- Tạo Specific Repositories:
+  - `UserRepository`: GetByEmailAsync, EmailExistsAsync, GetUserWithCartAsync, GetUserWithOrdersAsync
+  - `ProductRepository`: GetProductsByCategoryAsync, GetActiveProductsAsync, GetProductWithVariantsAsync, SearchProductsAsync
+  - `CategoryRepository`: GetCategoryWithProductsAsync, GetActiveCategoriesAsync
+  - `OrderRepository`: GetOrdersByUserIdAsync, GetOrderWithDetailsAsync, GetOrdersByStatusAsync, GetRecentOrdersAsync
 
-**Specific Repositories:**
-- `IUserRepository` & `UserRepository` - Quản lý users với các methods đặc biệt:
-  - GetByEmailAsync, EmailExistsAsync
-  - GetUserWithCartAsync, GetUserWithOrdersAsync
-  
-- `IProductRepository` & `ProductRepository` - Quản lý products:
-  - GetProductsByCategoryAsync
-  - GetActiveProductsAsync
-  - GetProductWithVariantsAsync
-  - SearchProductsAsync
-  
-- `ICategoryRepository` & `CategoryRepository` - Quản lý categories:
-  - GetCategoryWithProductsAsync
-  - GetActiveCategoriesAsync
-  
-- `IOrderRepository` & `OrderRepository` - Quản lý orders:
-  - GetOrdersByUserIdAsync
-  - GetOrderWithDetailsAsync
-  - GetOrdersByStatusAsync
-  - GetRecentOrdersAsync
+### 2. Unit of Work Pattern
 
-### 2. Unit of Work Pattern ✅
+- Tạo `IUnitOfWork` và `UnitOfWork` class
+- Transaction management: BeginTransactionAsync, CommitAsync, RollbackAsync
+- Quản lý repositories: Users, Products, Categories, Orders, Carts, CartItems, OrderItems, Payments, ProductVariants, Colors, Sizes
+- Implement Dispose pattern
 
-- Tạo `IUnitOfWork` interface
-- Implement `UnitOfWork` class:
-  - Quản lý tất cả repositories
-  - Transaction management (Begin, Commit, Rollback)
-  - SaveChanges coordination
-  - Proper disposal pattern
+### 3. Business Logic Layer (BLL)
 
-**Repositories được quản lý:**
-- Users, Products, Categories, Orders
-- Carts, CartItems, OrderItems, Payments
-- ProductVariants, Colors, Sizes
+**DTOs:**
 
-### 3. Business Logic Layer (BLL) ✅
+- `UserDTOs`: UserRegisterDto, UserLoginDto, UserDto, UserUpdateDto
+- `ProductDTOs`: ProductDto, ProductCreateDto, ProductUpdateDto
+- `CategoryDTOs`: CategoryDto, CategoryCreateDto, CategoryUpdateDto
 
-**DTOs Created:**
-- `UserDTOs.cs`: UserRegisterDto, UserLoginDto, UserDto, UserUpdateDto
-- `ProductDTOs.cs`: ProductDto, ProductCreateDto, ProductUpdateDto
-- `CategoryDTOs.cs`: CategoryDto, CategoryCreateDto, CategoryUpdateDto
+**Services:**
 
-**Service Interfaces:**
-- `IUserService` - Authentication & user management
-- `IProductService` - Product CRUD operations
-- `ICategoryService` - Category management
+- `UserService`: RegisterAsync, LoginAsync, GetUserByIdAsync, GetUserByEmailAsync, UpdateProfileAsync, ChangePasswordAsync, DeactivateUserAsync, EmailExistsAsync
+- `ProductService`: GetAllProductsAsync, GetActiveProductsAsync, GetProductsByCategoryAsync, GetProductByIdAsync, SearchProductsAsync, CreateProductAsync, UpdateProductAsync, DeleteProductAsync (soft delete)
+- `CategoryService`: GetAllCategoriesAsync, GetActiveCategoriesAsync, GetCategoryByIdAsync, CreateCategoryAsync, UpdateCategoryAsync, DeleteCategoryAsync (with validation)
 
-**Service Implementations:**
+### 4. Helper Classes
 
-**UserService:**
-- RegisterAsync - Đăng ký user mới với validation
-- LoginAsync - Xác thực đăng nhập
-- GetUserByIdAsync, GetUserByEmailAsync
-- UpdateProfileAsync - Cập nhật thông tin user
-- ChangePasswordAsync - Đổi mật khẩu
-- DeactivateUserAsync - Khóa tài khoản
-- EmailExistsAsync - Kiểm tra email tồn tại
+- `PasswordHasher`: HashPassword (SHA256), VerifyPassword methods
 
-**ProductService:**
-- GetAllProductsAsync, GetActiveProductsAsync
-- GetProductsByCategoryAsync
-- GetProductByIdAsync với variants
-- SearchProductsAsync
-- CreateProductAsync với validation
-- UpdateProductAsync
-- DeleteProductAsync (soft delete)
+---
 
-**CategoryService:**
-- GetAllCategoriesAsync, GetActiveCategoriesAsync
-- GetCategoryByIdAsync với products
-- CreateCategoryAsync
-- UpdateCategoryAsync
-- DeleteCategoryAsync với validation (không xóa nếu có products)
+## Kế Hoạch Tuần 03
 
-### 4. Helper Classes ✅
-
-**PasswordHasher:**
-- HashPassword method sử dụng SHA256
-- VerifyPassword method để kiểm tra mật khẩu
-- Secure password storage
+- Tạo ViewModels cho toàn bộ hệ thống
+- Xây dựng giao diện khách hàng (Customer Pages): Products, Cart, Orders
+- Tạo Layouts và CSS themes
+- Xây dựng Staff Dashboard và quản lý cơ bản
 
 ### 5. Database Seed Data ✅
 
 **DbInitializer:**
+
 - Seed 5 Categories (Thể Thao, Công Sở, Sneaker, Sandal, Boot)
 - Seed 7 Colors (Đen, Trắng, Đỏ, Xanh Navy, Xám, Nâu, Xanh Lá)
 - Seed 9 Sizes (36-44)
@@ -112,6 +67,7 @@
 ### 6. Dependency Injection Configuration ✅
 
 **Program.cs Updates:**
+
 - Đăng ký DbContext với PostgreSQL
 - Đăng ký UnitOfWork
 - Đăng ký tất cả Repositories (Scoped lifetime)
@@ -122,16 +78,16 @@
 
 ## 📊 Thống Kê
 
-| Hạng Mục | Số Lượng |
-|----------|----------|
-| Repository Interfaces | 5 |
-| Repository Implementations | 5 |
-| Service Interfaces | 3 |
-| Service Implementations | 3 |
-| DTOs | 10+ |
-| Helper Classes | 1 |
-| Seed Data Classes | 1 |
-| Lines of Code Added | ~1500+ |
+| Hạng Mục                   | Số Lượng |
+| -------------------------- | -------- |
+| Repository Interfaces      | 5        |
+| Repository Implementations | 5        |
+| Service Interfaces         | 3        |
+| Service Implementations    | 3        |
+| DTOs                       | 10+      |
+| Helper Classes             | 1        |
+| Seed Data Classes          | 1        |
+| Lines of Code Added        | ~1500+   |
 
 ---
 
@@ -143,13 +99,14 @@
 ✅ 100% DTOs cho data transfer  
 ✅ 100% Dependency Injection configuration  
 ✅ 100% Database seed data  
-✅ Build project thành công  
+✅ Build project thành công
 
 ---
 
 ## 🔧 Công Nghệ Đã Sử Dụng
 
 ### Design Patterns
+
 - **Repository Pattern** - Data access abstraction
 - **Unit of Work Pattern** - Transaction management
 - **Dependency Injection** - Loose coupling
@@ -157,6 +114,7 @@
 - **DTO Pattern** - Data transfer objects
 
 ### Best Practices
+
 - Async/await patterns
 - Interface-based programming
 - SOLID principles
@@ -212,6 +170,7 @@ ShoesShopWeb.Entity/
 ## 🚀 Kế Hoạch Tuần 03
 
 ### 1. Database Migration
+
 - [ ] Khởi động Docker PostgreSQL
 - [ ] Cài đặt dotnet-ef tools
 - [ ] Tạo migration InitialCreate
@@ -219,18 +178,21 @@ ShoesShopWeb.Entity/
 - [ ] Verify database schema
 
 ### 2. API Controllers
+
 - [ ] Tạo AuthController (Login, Register)
 - [ ] Tạo ProductsController (CRUD)
 - [ ] Tạo CategoriesController (CRUD)
 - [ ] Implement API responses standardization
 
 ### 3. Authentication & Authorization
+
 - [ ] Implement JWT authentication
 - [ ] Add authorization policies
 - [ ] Protect API endpoints
 - [ ] Session management
 
 ### 4. UI Development
+
 - [ ] Tạo trang Home/Index
 - [ ] Tạo trang Products listing
 - [ ] Tạo trang Product details
@@ -241,19 +203,23 @@ ShoesShopWeb.Entity/
 ## ⚠️ Vấn Đề Gặp Phải & Giải Quyết
 
 ### 1. **Circular dependency trong DbInitializer**
+
 **Vấn đề:** DAL layer không nên reference BLL layer (PasswordHasher)
 
 **Giải pháp:** Tạo local HashPassword method trong DbInitializer
 
 ### 2. **Model property mismatch**
+
 **Vấn đề:** ApplicationDbContext sử dụng property names không khớp với Entity models
 
-**Giải pháp:** 
+**Giải pháp:**
+
 - Kiểm tra các entity models
 - Sửa property names trong DbContext configuration
 - Sử dụng đúng: VariantId (không phải ProductVariantId), UnitPrice (không phải Price)
 
 ### 3. **EF Core version conflict warning**
+
 **Vấn đề:** Version conflict giữa EF Core 9.0.1 và 9.0.10
 
 **Giải pháp:** Warning không ảnh hưởng build, sẽ standardize versions sau
@@ -263,21 +229,25 @@ ShoesShopWeb.Entity/
 ## 💡 Bài Học
 
 1. **Repository Pattern Benefits:**
+
    - Separation of concerns
    - Easy testing với mock repositories
    - Centralized data access logic
 
 2. **Unit of Work Importance:**
+
    - Transaction management
    - Coordinating multiple repository operations
    - Ensuring data consistency
 
 3. **Service Layer Value:**
+
    - Business logic separation
    - Reusable business operations
    - Easy to test independently
 
 4. **DTO Benefits:**
+
    - Data encapsulation
    - Validation at boundary
    - API versioning flexibility
@@ -292,6 +262,7 @@ ShoesShopWeb.Entity/
 ## 📝 Ghi Chú Kỹ Thuật
 
 ### Repository Pattern
+
 ```csharp
 // Generic Repository cho common operations
 IRepository<T> -> Repository<T>
@@ -301,12 +272,14 @@ IUserRepository : IRepository<User> -> UserRepository
 ```
 
 ### Unit of Work Pattern
+
 ```csharp
 // Centralized repository management & transactions
 UnitOfWork -> Users, Products, Categories, Orders...
 ```
 
 ### Service Layer
+
 ```csharp
 // Business logic & validation
 Service -> UnitOfWork -> Repositories -> DbContext
